@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Word Essay Game</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; background: #f5f5f3; }
+    h1 { color: #333; }
+    .panel { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    .kata-chip { display: inline-block; padding: 6px 14px; margin: 4px; border-radius: 20px; background: #e8e6df; font-size: 14px; font-weight: 500; }
+    .kata-chip.used { background: #d4edda; color: #2d6a2d; }
+    select, button { padding: 8px 16px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; cursor: pointer; }
+    button { background: #4a90d9; color: white; border: none; margin-left: 8px; }
+    button:hover { background: #357abd; }
+    textarea { width: 100%; height: 180px; border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; line-height: 1.6; resize: none; margin-top: 8px; }
+    #timer { font-size: 24px; font-weight: bold; color: #333; }
+    #progress { font-size: 13px; color: #888; margin-top: 4px; }
+    #hasil { display: none; }
+    #skor-nilai { font-size: 48px; font-weight: bold; color: #4a90d9; }
+    #feedback-text { margin-top: 12px; line-height: 1.6; color: #444; }
+    .btn-nilai { background: #27ae60; width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; border: none; color: white; cursor: pointer; margin-top: 8px; }
+    .btn-nilai:hover { background: #219150; }
+    .loading { color: #888; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<h1>✍️ Word Essay Game</h1>
+
+<div class="panel">
+  <label>Tingkat kesulitan: </label>
+  <select id="tingkat">
+    <option value="mudah">Mudah</option>
+    <option value="menengah">Menengah</option>
+    <option value="sulit">Sulit</option>
+  </select>
+  <button onclick="mulaiBaru()">Kata Baru</button>
+  <span style="float:right" id="timer">05:00</span>
+</div>
+
+<div class="panel">
+  <div style="margin-bottom:8px"><strong>Kata acak:</strong></div>
+  <div id="kata-container">Klik "Kata Baru" untuk mulai</div>
+  <div id="progress"></div>
+</div>
+
+<div class="panel">
+  <div><strong>Tulis esaimu:</strong> <span id="jumlah-kata" style="float:right;color:#aaa;font-size:13px">0 kata</span></div>
+  <textarea id="esai" placeholder="Rangkai kata-kata di atas menjadi sebuah paragraf yang padu..." oninput="cekKata()"></textarea>
+  <button class="btn-nilai" onclick="nilaiEsai()">Nilai Esai →</button>
+</div>
+
+<div class="panel" id="hasil">
+  <strong>Hasil Penilaian AI</strong>
+  <div id="skor-nilai"></div>
+  <div id="feedback-text"></div>
+</div>
+
+<script>
+let kataAktif = [];
+let timer = null;
+let sisaDetik = 300;
+let timerJalan = false;
+
+function mulaiBaru() {
+  const tingkat = document.getElementById('tingkat').value;
+  fetch(`/kata-acak?tingkat=${tingkat}`)
+    .then(r => r.json())
+    .then(data => {
+      kataAktif = data.kata;
+      tampilkanKata();
+      resetTimer();
+      document.getElementById('esai').value = '';
+      document.getElementById('jumlah-kata').textContent = '0 kata';
+      document.getElementById('hasil').style.display = 'none';
+      document.getElementById('progress').textContent = '';
+    });
+}
+
+function tampilkanKata() {
+  const container = document.getElementById('kata-container');
+  container.innerHTML = kataAktif.map(k =>
+    `<span class="kata-chip" id="chip-${k}">${k}</span>`
+  ).join('');
+}
+
+function cekKata() {
+  if (!timerJalan && document.getElementById('esai').value.length > 0) {
+    mulaiTimer();
+  }
+  const teks = document.getElementById('esai').value.toLowerCase();
+  const words = document.getElementById('esai').value.trim().split(/\s+/).filter(Boolean);
+  document.getElementById('jumlah-kata').textContent = words.length + ' kata';
+
+  let terpakai = 0;
+  kataAktif.forEach(k => {
+    const re = new RegExp('\\b' + k.toLowerCase() + '\\b', 'i');
+    const chip = document.getElementById('chip-' + k);
+    if (chip) {
+      if (re.test(teks)) { chip.classList.add('used'); terpakai++; }
+      else { chip.classList.remove('used'); }
+    }
+  });
+
+  if (kataAktif.length > 0) {
+    document.getElementById('progress').textContent =
+      `${terpakai} / ${kataAktif.length} kata digunakan`;
+  }
+}
+
+function mulaiTimer() {
+  timerJalan = true;
+  timer = setInterval(() => {
+    sisaDetik--;
+    const m = String(Math.floor(sisaDetik / 60)).padStart(2, '0');
+    const s = String(sisaDetik % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+    if (sisaDetik <= 0) {
+      clearInterval(timer);
+      document.getElementById('timer').style.color = 'red';
+    }
+  }, 1000);
+}
+
+function resetTimer() {
+  clearInterval(timer);
+  timerJalan = false;
+  sisaDetik = 300;
+  document.getElementById('timer').textContent = '05:00';
+  document.getElementById('timer').style.color = '#333';
+}
+
+function nilaiEsai() {
+  const esai = document.getElementById('esai').value.trim();
+  if (!esai) { alert('Tulis esai dulu!'); return; }
+  if (kataAktif.length === 0) { alert('Klik Kata Baru dulu!'); return; }
+
+  document.getElementById('hasil').style.display = 'block';
+  document.getElementById('skor-nilai').textContent = '...';
+  document.getElementById('feedback-text').innerHTML = '<span class="loading">Menilai esai...</span>';
+
+  fetch('/nilai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ esai: esai, kata: kataAktif })
+  })
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('skor-nilai').textContent = data.skor + ' / 100';
+    document.getElementById('feedback-text').innerHTML = data.feedback.replace(/\n/g, '<br>');
+  })
+  .catch(() => {
+    document.getElementById('feedback-text').textContent = 'Terjadi error. Coba lagi.';
+  });
+}
+</script>
+</body>
+</html>
