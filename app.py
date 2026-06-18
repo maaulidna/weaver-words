@@ -2,9 +2,6 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 import random
 import json
 import os
-import sqlite3
-import uuid
-import base64
 from groq import Groq
 
 # Memuat file .env jika ada (sangat berguna untuk development lokal)
@@ -17,22 +14,6 @@ if os.path.exists('.env'):
                 os.environ[key.strip()] = val.strip().strip('"').strip("'")
 
 app = Flask(__name__)
-
-def init_db():
-    conn = sqlite3.connect('shares.db')
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS shares (
-            id TEXT PRIMARY KEY,
-            kata TEXT,
-            esai TEXT,
-            skor TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
-
-init_db()
 
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
@@ -185,74 +166,6 @@ Berikan respons HANYA dalam format JSON dengan skema objek berikut (tanpa markdo
             'status': 'error',
             'error': str(e)
         }), 500
-
-@app.route('/upload-share', methods=['POST'])
-def upload_share():
-    try:
-        data = request.get_json()
-        share_id = str(uuid.uuid4())[:8]
-        
-        # Save image to disk
-        image_data = data.get('image', '')
-        if image_data.startswith('data:image/png;base64,'):
-            image_data = image_data.replace('data:image/png;base64,', '')
-        
-        image_bytes = base64.b64decode(image_data)
-        
-        # Ensure static/shares directory exists
-        shares_dir = os.path.join(app.root_path, 'static', 'shares')
-        if not os.path.exists(shares_dir):
-            os.makedirs(shares_dir)
-            
-        image_path = os.path.join(shares_dir, f"{share_id}.png")
-        with open(image_path, "wb") as f:
-            f.write(image_bytes)
-            
-        # Save data to DB
-        kata = json.dumps(data.get('kata', []))
-        esai = data.get('esai', '')
-        skor = json.dumps(data.get('skor', {}))
-        
-        conn = sqlite3.connect('shares.db')
-        c = conn.cursor()
-        c.execute("INSERT INTO shares (id, kata, esai, skor) VALUES (?, ?, ?, ?)",
-                  (share_id, kata, esai, skor))
-        conn.commit()
-        conn.close()
-        
-        return jsonify({'status': 'success', 'id': share_id})
-    except Exception as e:
-        return jsonify({'status': 'error', 'error': str(e)}), 500
-
-@app.route('/share/<share_id>')
-def view_share(share_id):
-    conn = sqlite3.connect('shares.db')
-    c = conn.cursor()
-    c.execute("SELECT kata, esai, skor FROM shares WHERE id = ?", (share_id,))
-    row = c.fetchone()
-    conn.close()
-    
-    if row:
-        kata = json.loads(row[0])
-        esai = row[1]
-        skor = json.loads(row[2])
-        image_url = f"/static/shares/{share_id}.png"
-        
-        # Construct full URL for OG tags
-        host_url = request.host_url.rstrip('/')
-        full_image_url = f"{host_url}{image_url}"
-        share_url = f"{host_url}/share/{share_id}"
-        
-        return render_template('share.html', 
-                               share_id=share_id, 
-                               kata=kata, 
-                               esai=esai, 
-                               skor=skor, 
-                               image_url=image_url,
-                               full_image_url=full_image_url,
-                               share_url=share_url)
-    else:
-        return "Share not found", 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
