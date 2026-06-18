@@ -1,20 +1,30 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import random
 import json
 import os
 from groq import Groq
 
+# Memuat file .env jika ada (sangat berguna untuk development lokal)
+if os.path.exists('.env'):
+    with open('.env', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, val = line.split('=', 1)
+                os.environ[key.strip()] = val.strip().strip('"').strip("'")
+
 app = Flask(__name__)
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 KATA = {
     'mudah': [
+        ['piring', 'sendok', 'sepeda', 'buku', 'kucing', 'garpu'],
         ['rumah', 'air', 'makan', 'jalan', 'pohon', 'tidur'],
         ['buku', 'hujan', 'langit', 'tangan', 'suara', 'angin'],
         ['meja', 'kursi', 'pintu', 'lampu', 'bunga', 'sungai'],
     ],
-    'menengah': [
+    'sedang': [
         ['badai', 'kacamata', 'lumpur', 'helikopter', 'kamus', 'sungai'],
         ['cermin', 'gunung', 'anggur', 'perahu', 'awan', 'mercusuar'],
         ['teleskop', 'kawanan', 'labirin', 'kompas', 'fosil', 'kanvas'],
@@ -22,7 +32,7 @@ KATA = {
     'sulit': [
         ['entropi', 'kamuflase', 'sinestesia', 'arketipe', 'paradigma', 'gerhana'],
         ['eklektik', 'resonansi', 'absurditas', 'simbiosis', 'katarsis', 'euforia'],
-        ['metafisika', 'nihilisme', 'dialektika', 'epistemologi', 'fenomenologi', 'ontologi'],
+        ['metafizika', 'nihilisme', 'dialektika', 'epistemologi', 'fenomenologi', 'ontologi'],
     ]
 }
 
@@ -30,13 +40,20 @@ KATA = {
 def home():
     return render_template('index.html')
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.png', mimetype='image/png')
+
 @app.route('/kata-acak', methods=['GET'])
 def kata_acak():
     tingkat = request.args.get('tingkat', 'mudah')
     daftar = KATA.get(tingkat, KATA['mudah'])
-    kata = random.choice(daftar)
+    kata_full = random.choice(daftar)
+    # Sample exactly 6 words (or min of 6 and length)
+    kata = random.sample(kata_full, min(6, len(kata_full)))
     return jsonify({
-        'kata': kata,
+        'kata': [k.capitalize() for k in kata],
         'tingkat': tingkat
     })
 
@@ -57,19 +74,39 @@ Esai yang ditulis pengguna:
 \"\"\"{esai}\"\"\"
 
 Nilai esai ini berdasarkan 4 dimensi berikut:
-1. Koherensi dan Kohesi (0-25)
-2. Kreativitas dan Integrasi Kata (0-30)
-3. Kebahasaan (0-25)
-4. Ketepatan Penggunaan Kata Acak (0-20)
+1. Koherensi (0-25): Mengukur perpaduan dan kelancaran alur paragraf.
+2. Kebahasaan (0-25): Mengukur kesesuaian tata bahasa, ejaan, tanda baca, dan efektivitas kalimat.
+3. Kreativitas (0-30): Mengukur keunikan ide, cara menghubungkan kata, dan gaya bercerita.
+4. Penggunaan Kata (0-20): Mengukur ketepatan pemakaian kata-kata acak yang ditentukan dalam konteks kalimat. Kata-kata tersebut diperbolehkan menggunakan imbuhan bahasa Indonesia (awalan/akhiran/sisipan/gabungan, misalnya jika kata dasarnya "sepeda", maka kata "bersepeda", "sepedanya", dll. tetap dianggap terpakai secara sah).
 
-Berikan respons HANYA dalam format JSON:
+Berikan respons HANYA dalam format JSON dengan skema objek berikut (tanpa markdown code block, tanpa penjelasan tambahan):
 {{
-  "skor_koherensi": 0,
-  "skor_kreativitas": 0,
-  "skor_kebahasaan": 0,
-  "skor_penggunaan_kata": 0,
+  "koherensi": {{
+    "skor": 0,
+    "max_skor": 25,
+    "feedback": "Penjelasan singkat mengenai koherensi...",
+    "tips": "Tips taktis dan contoh konkret/bagus untuk meningkatkan koherensi esai ini."
+  }},
+  "kebahasaan": {{
+    "skor": 0,
+    "max_skor": 25,
+    "feedback": "Penjelasan singkat mengenai kebahasaan...",
+    "tips": "Tips taktis dan contoh konkret/bagus untuk memperbaiki ejaan atau tata bahasa esai ini."
+  }},
+  "kreativitas": {{
+    "skor": 0,
+    "max_skor": 30,
+    "feedback": "Penjelasan singkat mengenai kreativitas...",
+    "tips": "Tips taktis dan contoh konkret/bagus untuk mengembangkan ide/cerita agar lebih kreatif."
+  }},
+  "penggunaan_kata": {{
+    "skor": 0,
+    "max_skor": 20,
+    "feedback": "Penjelasan singkat mengenai ketepatan penggunaan kata...",
+    "tips": "Tips taktis dan contoh konkret/bagus cara menyisipkan kata acak dengan lebih halus."
+  }},
   "skor_total": 0,
-  "feedback": "..."
+  "feedback_umum": "Ulasan singkat keseluruhan..."
 }}"""
 
         response = client.chat.completions.create(
@@ -87,22 +124,48 @@ Berikan respons HANYA dalam format JSON:
 
         hasil = json.loads(teks)
 
+        # Validate structure and enforce standard ranges
+        def parse_dim(key, max_val):
+            dim = hasil.get(key, {})
+            if not isinstance(dim, dict):
+                dim = {}
+            score = dim.get('skor', 0)
+            try:
+                score = int(score)
+            except:
+                score = 0
+            # clamp score between 0 and max_val
+            score = max(0, min(max_val, score))
+            return {
+                'skor': score,
+                'max_skor': max_val,
+                'feedback': dim.get('feedback', 'Evaluasi selesai.'),
+                'tips': dim.get('tips', 'Posisikan kalimat secara logis dan pastikan transisi antar paragraf halus.')
+            }
+
+        koherensi = parse_dim('koherensi', 25)
+        kebahasaan = parse_dim('kebahasaan', 25)
+        kreativitas = parse_dim('kreativitas', 30)
+        penggunaan_kata = parse_dim('penggunaan_kata', 20)
+
+        # calculate total score as sum of scores
+        total_skor = koherensi['skor'] + kebahasaan['skor'] + kreativitas['skor'] + penggunaan_kata['skor']
+
         return jsonify({
-            'skor': hasil['skor_total'],
-            'feedback': (
-                f"Koherensi: {hasil['skor_koherensi']}/25 | "
-                f"Kreativitas: {hasil['skor_kreativitas']}/30 | "
-                f"Kebahasaan: {hasil['skor_kebahasaan']}/25 | "
-                f"Penggunaan Kata: {hasil['skor_penggunaan_kata']}/20\n\n"
-                f"{hasil['feedback']}"
-            )
+            'status': 'success',
+            'koherensi': koherensi,
+            'kebahasaan': kebahasaan,
+            'kreativitas': kreativitas,
+            'penggunaan_kata': penggunaan_kata,
+            'skor_total': total_skor,
+            'feedback_umum': hasil.get('feedback_umum', 'Penilaian selesai.')
         })
 
     except Exception as e:
         return jsonify({
-            'skor': 0,
-            'feedback': f'Error: {str(e)}'
+            'status': 'error',
+            'error': str(e)
         }), 500
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
