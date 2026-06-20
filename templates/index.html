@@ -13,6 +13,7 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=VT323&display=swap"
     rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
     :root {
@@ -70,31 +71,30 @@
 
     .game-wrapper {
       display: flex;
-      gap: 32px;
-      justify-content: center;
-      align-items: stretch;
-      max-width: 1360px;
-      /* Lebarkan pembungkus utama */
+      flex-direction: column;
+      align-items: center;
+      max-width: 800px;
       width: 100%;
       margin: 0 auto;
-      transform: scale(0.9);
     }
 
     .app-container {
       width: 100%;
-      max-width: 660px;
-      /* Lebarkan card esai */
+      max-width: 800px;
       background-color: var(--bg-card);
       border-radius: 24px;
       box-shadow: var(--shadow-md);
-      padding: 32px;
+      padding: 40px;
       border: 1px solid var(--border-color);
-      flex-shrink: 0;
+      box-sizing: border-box;
     }
 
     /* Header & Logo styling matching mockup */
     header {
       margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .logo-container {
@@ -227,20 +227,18 @@
     }
 
     .words-list {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
       gap: 12px;
+      width: 100%;
     }
 
     .word-chip {
-      flex: 1;
-      min-width: 0;
-      /* Izinkan menyusut agar muat dalam satu baris */
+      width: 100%;
       text-align: center;
-      font-size: 13px;
-      /* Ukuran font disesuaikan agar pas di desktop */
+      font-size: 14px;
       font-weight: 600;
-      padding: 12px 4px;
-      /* Padding dikurangi */
+      padding: 12px 6px;
       border-radius: 12px;
       background-color: var(--chip-bg);
       color: var(--chip-text);
@@ -252,7 +250,6 @@
       justify-content: center;
       gap: 6px;
       white-space: nowrap;
-      /* Mencegah tulisan patah baris */
       text-overflow: ellipsis;
       overflow: hidden;
     }
@@ -293,18 +290,20 @@
 
     textarea {
       width: 100%;
-      height: 130px;
+      height: 140px;
       border-radius: 16px;
       border: 2px solid var(--border-color);
       padding: 18px;
       font-family: inherit;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.6;
       resize: none;
       outline: none;
-      transition: var(--transition);
+      transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
       color: var(--text-main);
       background-color: #fafbfd;
+      overflow-y: hidden;
+      box-sizing: border-box;
     }
 
     textarea:focus {
@@ -382,27 +381,37 @@
     }
 
     /* Loading Area */
-    .loading-container {
-      display: flex;
+    #loading-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 0;
-      gap: 16px;
+      z-index: 15000;
+      gap: 20px;
     }
 
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border: 4px solid var(--border-color);
+    #loading-container .spinner {
+      width: 64px;
+      height: 64px;
+      border: 5px solid var(--border-color);
       border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
 
-    .loading-container p {
-      font-weight: 600;
-      color: var(--text-muted);
+    #loading-container p {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     @keyframes spin {
@@ -411,52 +420,62 @@
       }
     }
 
-    /* Results Dashboard */
+    /* Results Dashboard Overlay */
     .results-section {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      max-width: 660px;
-      /* Lebarkan card hasil penilaian */
-      background-color: var(--bg-card);
-      border-radius: 24px;
-      box-shadow: var(--shadow-md);
-      padding: 32px;
-      border: 1px solid var(--border-color);
-      flex-shrink: 0;
+      height: 100%;
+      background-color: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 13000;
       opacity: 0;
-      transform: translateX(40px);
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+      transition: opacity 0.4s ease;
     }
 
     .results-section.active {
-      display: block;
+      display: flex;
       opacity: 1;
-      transform: translateX(0);
+    }
+
+    .results-modal-card {
+      background-color: var(--bg-card);
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      width: 92%;
+      max-width: 1200px;
+      padding: 32px 40px;
+      border: 1px solid var(--border-color);
+      transform: scale(0.95);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-height: 95vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .results-section.active .results-modal-card {
+      transform: scale(1);
     }
 
     .results-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 16px;
       color: var(--text-main);
-      max-width: 560px;
-      /* Samakan dengan batas grup tengah */
       width: 100%;
-      margin-left: auto;
-      margin-right: auto;
     }
 
     .results-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 28px;
-      max-width: 560px;
-      /* Batasi lebar grup penilaian */
+      gap: 16px;
+      margin-bottom: 20px;
       width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-      /* Pusatkan grup grid di tengah card */
     }
 
     .result-card {
@@ -569,7 +588,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
+      z-index: 14000;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
@@ -689,14 +708,10 @@
     .overall-feedback-container {
       background-color: #f1f5f9;
       border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 28px;
+      padding: 16px 20px;
+      margin-bottom: 0;
       border: 1px solid var(--border-color);
-      max-width: 560px;
-      /* Batasi lebar agar sejajar dengan grid */
       width: 100%;
-      margin-left: auto;
-      margin-right: auto;
     }
 
     .overall-title {
@@ -712,37 +727,138 @@
       line-height: 1.5;
     }
 
-    /* Action Buttons in Results */
-    .results-actions {
+    /* New Side-by-Side Flex Layout inside Results Card */
+    .results-flex-layout {
       display: flex;
-      gap: 16px;
-      max-width: 560px;
-      margin-left: auto;
-      margin-right: auto;
-      margin-bottom: 28px;
+      gap: 28px;
+      width: 100%;
+      margin-bottom: 24px;
     }
 
-    .btn-share {
-      flex: 1;
+    .results-left-col {
+      flex: 1.4;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .results-right-col {
+      flex: 0.85;
+      min-width: 280px;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: stretch;
+      justify-content: flex-start;
+    }
+
+    .share-preview-box {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background-color: var(--bg-body);
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .share-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
+    .share-preview-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .spinner-small {
+      width: 36px;
+      height: 36px;
+      border: 3.5px solid var(--border-color);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .share-actions-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .btn-share-action {
       font-family: inherit;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      color: var(--primary);
-      background-color: #e8edff;
-      border: 2px solid var(--primary);
+      color: #ffffff;
+      background-color: var(--primary);
+      border: none;
       border-radius: 12px;
-      padding: 16px;
+      padding: 12px 14px;
       cursor: pointer;
       transition: var(--transition);
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
+      box-shadow: 0 4px 12px rgba(70, 88, 204, 0.15);
     }
 
-    .btn-share:hover {
+    .btn-share-action:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(70, 88, 204, 0.25);
+    }
+
+    .btn-share-action:active {
+      transform: translateY(0);
+    }
+
+    .btn-share-action.secondary {
+      background-color: #e8edff;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      box-shadow: none;
+    }
+
+    .btn-share-action.secondary:hover {
       background-color: #d1dbff;
       transform: translateY(-2px);
+    }
+
+    body.dark-mode .btn-share-action.secondary {
+      background-color: #1e293b;
+      color: #38bdf8;
+      border-color: #38bdf8;
+    }
+
+    body.dark-mode .btn-share-action.secondary:hover {
+      background-color: rgba(56, 189, 248, 0.1);
+    }
+
+    .btn-share-action.play-again {
+      background-color: var(--level-green);
+      box-shadow: 0 4px 12px rgba(69, 196, 150, 0.15);
+    }
+
+    .btn-share-action.play-again:hover {
+      background-color: var(--level-green-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(69, 196, 150, 0.25);
     }
 
     /* Share Card (Hidden from normal view) */
@@ -937,6 +1053,16 @@
     }
 
     /* Responsive layout settings */
+    @media (max-width: 900px) {
+      .results-flex-layout {
+        flex-direction: column;
+        gap: 24px;
+      }
+      .results-right-col {
+        min-width: 100%;
+      }
+    }
+
     @media (max-width: 1360px) {
       .game-wrapper {
         flex-direction: column;
@@ -975,6 +1101,557 @@
       .logo-row-2 {
         font-size: 40px;
       }
+    }
+
+    /* Welcome Modal Overlay */
+    .welcome-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 11000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .welcome-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Welcome Card Outer (with image background) */
+    .welcome-card {
+      width: 90%;
+      max-width: 500px;
+      aspect-ratio: 1 / 1;
+      background-image: url('/static/popup-bg.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      box-sizing: border-box;
+    }
+
+    .welcome-backdrop.active .welcome-card {
+      transform: scale(1);
+    }
+
+    /* Tutorial Card container with white glassmorphism style */
+    .tutorial-card {
+      width: 95%;
+      max-width: 680px;
+      background-color: rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 32px;
+      padding: 36px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      color: #0f172a;
+      box-sizing: border-box;
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .welcome-backdrop.active .tutorial-card {
+      transform: scale(1);
+    }
+
+    .tutorial-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 20px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .tutorial-content-scroll {
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 8px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    /* Style scrollbar */
+    .tutorial-content-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .tutorial-content-scroll::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 3px;
+    }
+    .tutorial-content-scroll::-webkit-scrollbar-thumb {
+      background: rgba(70, 88, 204, 0.2);
+      border-radius: 3px;
+    }
+    .tutorial-content-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(70, 88, 204, 0.4);
+    }
+
+    .tutorial-steps {
+      margin-left: 20px;
+      margin-bottom: 24px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .tutorial-steps li {
+      margin-bottom: 12px;
+    }
+
+    .tutorial-sublist {
+      margin-top: 8px;
+      margin-left: 20px;
+      list-style-type: circle;
+    }
+
+    .tutorial-sublist li {
+      margin-bottom: 6px;
+    }
+
+    .tutorial-section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 24px;
+      margin-bottom: 14px;
+      border-bottom: 2px solid rgba(70, 88, 204, 0.1);
+      padding-bottom: 6px;
+    }
+
+    .tutorial-tips {
+      margin-left: 20px;
+      margin-bottom: 24px;
+      font-size: 15px;
+      line-height: 1.6;
+      list-style-type: square;
+    }
+
+    .tutorial-tips li {
+      margin-bottom: 8px;
+    }
+
+    .tutorial-goal-box {
+      background-color: rgba(70, 88, 204, 0.06);
+      border-left: 4px solid var(--primary);
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #1e293b;
+    }
+
+    /* Help/Tutorial button in header */
+    .btn-tutorial-help {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .btn-tutorial-help:hover {
+      background-color: rgba(70, 88, 204, 0.08);
+      transform: scale(1.08);
+    }
+
+    .btn-tutorial-help:active {
+      transform: scale(0.95);
+    }
+
+    /* Welcome Content Styles */
+    .welcome-logo {
+      height: 80px;
+      max-width: 100%;
+      object-fit: contain;
+      margin-bottom: 24px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .welcome-description {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.45;
+      margin-bottom: 24px;
+      max-width: 340px;
+      text-align: center; /* Rata tengah */
+    }
+
+    .welcome-lang-selector {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .welcome-lang-btn {
+      background-color: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #334155;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .welcome-lang-btn:hover {
+      border-color: var(--primary);
+      background-color: #f1f5f9;
+    }
+
+    .welcome-lang-btn.active {
+      background-color: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(70, 88, 204, 0.2);
+    }
+
+    /* Pulsing Start Button */
+    .welcome-btn-start {
+      background-color: #FFF08A;
+      color: #1e293b;
+      border: none;
+      border-radius: 16px;
+      padding: 14px 40px;
+      font-family: inherit;
+      font-size: 28px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(253, 238, 135, 0.4);
+      animation: welcome-pulse 1.8s infinite ease-in-out;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .welcome-btn-start:hover {
+      background-color: #fde047;
+      box-shadow: 0 10px 24px rgba(253, 238, 135, 0.6);
+    }
+
+    .welcome-subtext {
+      font-size: 13px;
+      color: #475569;
+      font-style: italic;
+      margin-top: 16px;
+    }
+
+    /* Keyframe for Button Pulse (Zoom In/Out) */
+    @keyframes welcome-pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.06);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* ==========================================
+       Dark Mode Theme
+       ========================================== */
+    body.dark-mode {
+      --bg-body: #0b0f19;
+      --bg-card: #151d30;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: #1e293b;
+
+      --chip-bg: #1e293b;
+      --chip-text: #cbd5e1;
+      --chip-used-bg: #064e3b;
+      --chip-used-text: #a7f3d0;
+      --chip-used-border: #065f46;
+
+      --results-card-bg: #1e293b;
+      --results-card-border: #334155;
+      --results-text: #cbd5e1;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-mode textarea {
+      background-color: #111827;
+      border-color: #1e293b;
+    }
+
+    body.dark-mode textarea:focus {
+      border-color: var(--primary);
+      background-color: #151d30;
+    }
+
+    body.dark-mode .btn-change-words:hover {
+      background-color: rgba(70, 88, 204, 0.15);
+    }
+
+    body.dark-mode .logo-row-1 {
+      color: #e2e8f0;
+    }
+
+    body.dark-mode .logo-row-2 {
+      color: #38bdf8;
+    }
+
+    body.dark-mode .logo-fun {
+      color: #f1f5f9;
+    }
+
+    body.dark-mode .overall-feedback-container {
+      background-color: #1e293b;
+      border-color: #334155;
+    }
+
+    body.dark-mode .tutorial-card.text-tutorial {
+      background-color: rgba(21, 29, 48, 0.9) !important;
+      color: #cbd5e1 !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    body.dark-mode .tutorial-title {
+      color: #38bdf8 !important;
+    }
+
+    body.dark-mode .tutorial-section-title {
+      color: #38bdf8 !important;
+      border-bottom-color: rgba(56, 189, 248, 0.15) !important;
+    }
+
+    body.dark-mode .tutorial-goal-box {
+      background-color: rgba(56, 189, 248, 0.1) !important;
+      border-left-color: #38bdf8 !important;
+      color: #cbd5e1 !important;
+    }
+
+    /* ==========================================
+       Header Controls (Language, Dark Mode, Settings)
+       ========================================== */
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-btn {
+      background-color: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .control-btn:hover {
+      background-color: rgba(70, 88, 204, 0.08);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .control-btn:active {
+      transform: translateY(0);
+    }
+
+    .control-btn svg {
+      color: var(--primary);
+    }
+
+    body.dark-mode .control-btn svg {
+      color: #38bdf8;
+    }
+
+    /* Language Switcher */
+    .lang-selector {
+      position: relative;
+    }
+
+    .lang-btn {
+      width: auto;
+      border-radius: 20px;
+      padding: 0 14px;
+      font-size: 13.5px;
+      font-weight: 700;
+      gap: 6px;
+    }
+
+    .lang-dropdown {
+      display: none;
+      position: absolute;
+      top: 46px;
+      right: 0;
+      background-color: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      z-index: 12000;
+      width: 170px;
+      overflow: hidden;
+      animation: dropdownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .lang-dropdown.show {
+      display: block;
+    }
+
+    .lang-option {
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      transition: var(--transition);
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lang-option:hover {
+      background-color: rgba(70, 88, 204, 0.08);
+    }
+
+    @keyframes dropdownFade {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ==========================================
+       Settings Modal Elements
+       ========================================== */
+    .settings-modal-card {
+      background-color: var(--bg-card);
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      width: 90%;
+      max-width: 440px;
+      padding: 28px;
+      border: 1.5px solid var(--border-color);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .modal-backdrop.active .settings-modal-card {
+      transform: scale(1);
+    }
+
+    .settings-row {
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .settings-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .word-count-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background-color: var(--bg-body);
+      border: 1.5px solid var(--border-color);
+      padding: 10px;
+      border-radius: 16px;
+    }
+
+    .word-count-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: none;
+      background-color: var(--bg-card);
+      color: var(--primary);
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .word-count-btn:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .word-count-value {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .btn-settings-save {
+      width: 100%;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(70, 88, 204, 0.2);
+      transition: var(--transition);
+    }
+
+    .btn-settings-save:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
     }
 
     @media (max-width: 600px) {
@@ -1033,25 +1710,175 @@
       .modal-card {
         padding: 20px 16px;
       }
+
+      /* Responsive adjustments for welcome modal */
+      .welcome-card {
+        padding: 32px;
+      }
+      .welcome-logo {
+        height: 50px;
+        margin-bottom: 12px;
+      }
+      .welcome-description {
+        font-size: 14px;
+        margin-bottom: 16px;
+        max-width: 220px;
+      }
+      .welcome-btn-start {
+        font-size: 20px;
+        padding: 10px 24px;
+        border-radius: 12px;
+      }
+      .welcome-subtext {
+        font-size: 11px;
+        margin-top: 8px;
+      }
+      .tutorial-card {
+        padding: 24px 16px !important;
+        border-radius: 24px;
+      }
+      .tutorial-title {
+        font-size: 20px;
+        margin-bottom: 16px;
+      }
+      .tutorial-steps, .tutorial-tips {
+        font-size: 13.5px;
+        margin-left: 16px;
+      }
+      .tutorial-goal-box {
+        font-size: 13.5px;
+        padding: 12px;
+      }
+      
+      /* Settings modal mobile responsive */
+      .settings-modal-card {
+        padding: 20px 16px;
+        border-radius: 20px;
+      }
+      .word-count-controls {
+        gap: 8px;
+        padding: 8px;
+      }
+      .word-count-btn {
+        width: 32px;
+        height: 32px;
+      }
+      .word-count-value {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 
 <body>
 
+  <!-- Welcome Modal Card -->
+  <div class="welcome-backdrop active" id="welcome-backdrop">
+    <div class="welcome-card">
+      <img src="/static/logo.png" alt="Weave Words Logo" class="welcome-logo">
+      <p class="welcome-description">Tenun kata tak berhubungan menjadi paragraf utuh</p>
+      
+      <!-- Welcome Lang Selector (Stays Light Mode Styled) -->
+      <div class="welcome-lang-selector">
+        <button class="welcome-lang-btn active" id="welcome-lang-id" onclick="changeLanguage('id')">
+          <img src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;" alt="ID"> ID
+        </button>
+        <button class="welcome-lang-btn" id="welcome-lang-en" onclick="changeLanguage('en')">
+          <img src="https://flagcdn.com/w20/gb.png" width="18" style="border-radius: 2px;" alt="EN"> EN
+        </button>
+      </div>
+
+      <button class="welcome-btn-start" onclick="closeWelcomeModal()">Mulai!</button>
+      <span class="welcome-subtext">klik tombol untuk bermain</span>
+    </div>
+  </div>
+
+  <!-- Tutorial Modal Card -->
+  <div class="welcome-backdrop" id="tutorial-backdrop" style="display: none;">
+    <div class="tutorial-card text-tutorial">
+      <h2 class="tutorial-title">Cara Bermain</h2>
+      <div class="tutorial-content-scroll">
+        <!-- Content inserted dynamically by applyTranslations() -->
+      </div>
+      <button class="welcome-btn-start tutorial-btn-close" onclick="closeTutorialModal()">Mulai Bermain!</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal Card -->
+  <div class="modal-backdrop" id="settings-modal-backdrop" onclick="closeSettingsModal()" style="display: none;">
+    <div class="settings-modal-card" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title" id="settings-title">Pengaturan Game</h3>
+        <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-row">
+          <label class="settings-label" id="settings-label-wordcount">Jumlah kata yang diberikan:</label>
+          <div class="word-count-controls">
+            <button class="word-count-btn" onclick="adjustWordCount(-1)">&minus;</button>
+            <span class="word-count-value" id="word-count-val">6</span>
+            <button class="word-count-btn" onclick="adjustWordCount(1)">&plus;</button>
+          </div>
+        </div>
+        <button class="btn-settings-save" onclick="saveSettings()" id="settings-save-btn">Simpan & Mulai Baru</button>
+      </div>
+    </div>
+  </div>
+
   <div class="game-wrapper">
     <div class="app-container">
       <!-- Header / Logo -->
       <header>
         <div class="logo-container">
-          <img src="/static/logo.png" alt="Weave Words Logo"
+          <img src="/static/logo.png" alt="Weave Words Logo" id="app-logo"
             style="height: 60px; display: block; max-width: 100%; object-fit: contain;">
+        </div>
+        
+        <div class="header-controls">
+          <!-- Language Selector -->
+          <div class="lang-selector">
+            <button class="control-btn lang-btn" onclick="toggleLangDropdown(event)">
+              <img id="current-lang-flag" src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;" alt="flag"> <span id="current-lang-text">ID</span>
+            </button>
+            <div class="lang-dropdown" id="lang-dropdown">
+              <div class="lang-option" onclick="changeLanguage('id')">
+                <img src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;" alt="ID"> <span>Indonesia (ID)</span>
+              </div>
+              <div class="lang-option" onclick="changeLanguage('en')">
+                <img src="https://flagcdn.com/w20/gb.png" width="18" style="border-radius: 2px;" alt="EN"> <span>English (EN)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dark Mode Toggle -->
+          <button class="control-btn" onclick="toggleDarkMode()" title="Toggle Dark Mode" id="btn-dark-mode">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Settings Button -->
+          <button class="control-btn" onclick="openSettingsModal()" title="Pengaturan">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+
+          <!-- Help/Tutorial Button -->
+          <button class="control-btn" onclick="openTutorialModal()" title="Cara Bermain">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </button>
         </div>
       </header>
 
       <!-- Level Selection -->
       <div class="level-section">
-        <span class="section-label">Level:</span>
+        <span class="section-label" id="label-level">Level:</span>
         <div class="level-buttons">
           <button class="btn-level active" data-level="mudah" onclick="selectLevel('mudah')">mudah</button>
           <button class="btn-level" data-level="sedang" onclick="selectLevel('sedang')">sedang</button>
@@ -1062,9 +1889,9 @@
       <!-- Words Section -->
       <div class="words-section">
         <div class="words-header">
-          <span class="section-label">Kata - kata yang harus dipakai:</span>
+          <span class="section-label" id="label-words">Kata - kata yang harus dipakai:</span>
           <button class="btn-change-words" onclick="fetchNewWords()">
-            Ganti kata <span class="reload-icon">↻</span>
+            <span id="text-change-words">Ganti kata</span> <span class="reload-icon">↻</span>
           </button>
         </div>
         <div class="words-list" id="words-list">
@@ -1075,11 +1902,11 @@
       <!-- Writing Area -->
       <div class="writing-section">
         <div class="writing-header">
-          <span class="section-label">Paragraf:</span>
+          <span class="section-label" id="label-essay">Paragraf:</span>
           <span class="word-counter" id="word-counter">0 kata</span>
         </div>
         <textarea id="essay-input" placeholder="Rangkai kata-kata di atas menjadi sebuah paragraf yang padu..."
-          oninput="checkWordUsage()"></textarea>
+          oninput="onEssayInput()"></textarea>
 
         <button class="btn-submit incomplete" id="btn-submit" onclick="submitEssay()">
           Nilai tulisanku &rarr;
@@ -1090,103 +1917,126 @@
       <!-- Loading Screen -->
       <div class="loading-container" id="loading-container" style="display: none;">
         <div class="spinner"></div>
-        <p>Menilai esai oleh AI...</p>
+        <p id="text-loading">Menilai esai oleh AI...</p>
       </div>
     </div>
 
     <!-- Results Dashboard -->
     <div class="results-section" id="results-section" style="display: none;">
-      <h2 class="results-title">Hasil Penilaian:</h2>
-      <div class="results-grid">
-        <!-- Card 1: Koherensi -->
-        <div class="result-card">
-          <div class="card-info">
-            <h3 class="card-title">Koherensi</h3>
-            <p class="card-feedback" id="feedback-koherensi">Penilaian koherensi akan muncul di sini.</p>
-            <button class="btn-read-more" onclick="openModal('koherensi')">Baca selengkapnya</button>
+      <div class="results-modal-card">
+        <button class="modal-close" onclick="closeResultsModal()" style="position: absolute; top: 20px; right: 28px;">&times;</button>
+        <h2 class="results-title" id="text-results-title">Hasil Penilaian:</h2>
+        
+        <div class="results-flex-layout">
+          <!-- Left Column: Metrics & Feedback -->
+          <div class="results-left-col">
+            <div class="results-grid">
+              <!-- Card 1: Koherensi -->
+              <div class="result-card">
+                <div class="card-info">
+                  <h3 class="card-title" id="title-koherensi">Koherensi</h3>
+                  <p class="card-feedback" id="feedback-koherensi">Penilaian koherensi akan muncul di sini.</p>
+                  <button class="btn-read-more" id="readmore-koherensi" onclick="openModal('koherensi')">Baca selengkapnya</button>
+                </div>
+                <div class="card-gauge">
+                  <svg viewBox="0 0 36 36" class="gauge-svg">
+                    <path class="gauge-bg"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="gauge-fill" id="fill-koherensi"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <text x="18" y="20.8" class="gauge-text" id="text-koherensi">0%</text>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Card 2: Kebahasaan -->
+              <div class="result-card">
+                <div class="card-info">
+                  <h3 class="card-title" id="title-kebahasaan">Kebahasaan</h3>
+                  <p class="card-feedback" id="feedback-kebahasaan">Penilaian kebahasaan akan muncul di sini.</p>
+                  <button class="btn-read-more" id="readmore-kebahasaan" onclick="openModal('kebahasaan')">Baca selengkapnya</button>
+                </div>
+                <div class="card-gauge">
+                  <svg viewBox="0 0 36 36" class="gauge-svg">
+                    <path class="gauge-bg"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="gauge-fill" id="fill-kebahasaan"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <text x="18" y="20.8" class="gauge-text" id="text-kebahasaan">0%</text>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Card 3: Kreativitas -->
+              <div class="result-card">
+                <div class="card-info">
+                  <h3 class="card-title" id="title-kreativitas">Kreativitas</h3>
+                  <p class="card-feedback" id="feedback-kreativitas">Penilaian kreativitas akan muncul di sini.</p>
+                  <button class="btn-read-more" id="readmore-kreativitas" onclick="openModal('kreativitas')">Baca selengkapnya</button>
+                </div>
+                <div class="card-gauge">
+                  <svg viewBox="0 0 36 36" class="gauge-svg">
+                    <path class="gauge-bg"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="gauge-fill" id="fill-kreativitas"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <text x="18" y="20.8" class="gauge-text" id="text-kreativitas">0%</text>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Card 4: Penggunaan Kata -->
+              <div class="result-card">
+                <div class="card-info">
+                  <h3 class="card-title" id="title-penggunaan_kata">Penggunaan Kata</h3>
+                  <p class="card-feedback" id="feedback-penggunaan_kata">Penilaian ketepatan kata akan muncul di sini.</p>
+                  <button class="btn-read-more" id="readmore-penggunaan_kata" onclick="openModal('penggunaan_kata')">Baca selengkapnya</button>
+                </div>
+                <div class="card-gauge">
+                  <svg viewBox="0 0 36 36" class="gauge-svg">
+                    <path class="gauge-bg"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="gauge-fill" id="fill-penggunaan_kata"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <text x="18" y="20.8" class="gauge-text" id="text-penggunaan_kata">0%</text>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Overall Summary -->
+            <div class="overall-feedback-container">
+              <div class="overall-title">Feedback Keseluruhan:</div>
+              <div class="overall-text" id="overall-feedback-text">Memuat penilaian...</div>
+            </div>
           </div>
-          <div class="card-gauge">
-            <svg viewBox="0 0 36 36" class="gauge-svg">
-              <path class="gauge-bg"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path class="gauge-fill" id="fill-koherensi"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <text x="18" y="20.8" class="gauge-text" id="text-koherensi">0%</text>
-            </svg>
+
+          <!-- Right Column: Share Preview Image & Action Buttons -->
+          <div class="results-right-col">
+            <div class="share-preview-box">
+              <div class="share-preview-loading" id="share-preview-loading">
+                <div class="spinner-small"></div>
+                <span id="text-generating-image">Membuat gambar...</span>
+              </div>
+              <img id="results-share-preview" src="" alt="Share Preview" style="display: none;">
+            </div>
+            
+            <div class="share-actions-stack">
+              <button class="btn-share-action" onclick="downloadImageDirectly()" id="btn-download-img">
+                📥 Download Gambar
+              </button>
+              <button class="btn-share-action secondary" onclick="copyCaptionOnly()" id="btn-copy-caption-results">
+                📋 Salin Caption
+              </button>
+              <button class="btn-share-action play-again" onclick="resetGame()" id="btn-play-again-results">
+                Main Lagi!
+              </button>
+            </div>
           </div>
         </div>
-
-        <!-- Card 2: Kebahasaan -->
-        <div class="result-card">
-          <div class="card-info">
-            <h3 class="card-title">Kebahasaan</h3>
-            <p class="card-feedback" id="feedback-kebahasaan">Penilaian kebahasaan akan muncul di sini.</p>
-            <button class="btn-read-more" onclick="openModal('kebahasaan')">Baca selengkapnya</button>
-          </div>
-          <div class="card-gauge">
-            <svg viewBox="0 0 36 36" class="gauge-svg">
-              <path class="gauge-bg"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path class="gauge-fill" id="fill-kebahasaan"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <text x="18" y="20.8" class="gauge-text" id="text-kebahasaan">0%</text>
-            </svg>
-          </div>
-        </div>
-
-        <!-- Card 3: Kreativitas -->
-        <div class="result-card">
-          <div class="card-info">
-            <h3 class="card-title">Kreativitas</h3>
-            <p class="card-feedback" id="feedback-kreativitas">Penilaian kreativitas akan muncul di sini.</p>
-            <button class="btn-read-more" onclick="openModal('kreativitas')">Baca selengkapnya</button>
-          </div>
-          <div class="card-gauge">
-            <svg viewBox="0 0 36 36" class="gauge-svg">
-              <path class="gauge-bg"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path class="gauge-fill" id="fill-kreativitas"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <text x="18" y="20.8" class="gauge-text" id="text-kreativitas">0%</text>
-            </svg>
-          </div>
-        </div>
-
-        <!-- Card 4: Penggunaan Kata -->
-        <div class="result-card">
-          <div class="card-info">
-            <h3 class="card-title">Penggunaan Kata</h3>
-            <p class="card-feedback" id="feedback-penggunaan_kata">Penilaian ketepatan kata akan muncul di sini.</p>
-            <button class="btn-read-more" onclick="openModal('penggunaan_kata')">Baca selengkapnya</button>
-          </div>
-          <div class="card-gauge">
-            <svg viewBox="0 0 36 36" class="gauge-svg">
-              <path class="gauge-bg"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path class="gauge-fill" id="fill-penggunaan_kata"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <text x="18" y="20.8" class="gauge-text" id="text-penggunaan_kata">0%</text>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Overall Summary -->
-      <div class="overall-feedback-container">
-        <div class="overall-title">Feedback Keseluruhan:</div>
-        <div class="overall-text" id="overall-feedback-text">Memuat penilaian...</div>
-      </div>
-
-      <div class="results-actions">
-        <button class="btn-share" onclick="openSharePreview()" id="btn-share">
-          Bagikan Tulisan 🚀
-        </button>
-        <button class="btn-play-again" onclick="resetGame()">
-          Main Lagi!
-        </button>
-      </div>
-    </div>
-  </div>
+      </div> <!-- Closes .results-modal-card -->
+    </div> <!-- Closes .results-section -->
+  </div> <!-- Closes .game-wrapper -->
 
   <!-- Share Card Container (Hidden) -->
   <div class="share-card-container" id="share-card">
@@ -1195,20 +2045,7 @@
     </div>
   </div>
 
-  <!-- Share Preview Modal -->
-  <div class="modal-backdrop" id="share-modal-backdrop" onclick="closeShareModal()">
-    <div class="share-modal-card" onclick="event.stopPropagation()">
-      <h3 style="margin-top: 0; margin-bottom: 20px; font-weight: 700; color: var(--text-main);">Preview Postinganmu
-      </h3>
-      <img id="share-preview-image" class="share-preview-img" src="" alt="Preview Gambar Share">
-      <div class="social-buttons" style="flex-direction: column; align-items: center; gap: 12px;">
-        <button class="btn-download-fallback" style="background-color: var(--primary); color: white; border: none;"
-          onclick="downloadImageDirectly()">📥 Download Gambar</button>
-        <button class="btn-download-fallback" id="btn-copy-caption" onclick="copyCaptionOnly()">📋 Salin
-          Caption</button>
-      </div>
-    </div>
-  </div>
+
 
   <!-- Toast Notification -->
   <div id="toast-notification" class="toast-notification">Caption berhasil disalin! 📋</div>
@@ -1222,15 +2059,15 @@
       </div>
       <div class="modal-body">
         <div class="modal-score-row">
-          <span class="modal-score-label">Nilai:</span>
+          <span class="modal-score-label" id="modal-label-score">Nilai:</span>
           <span class="modal-score-badge" id="modal-score">0%</span>
         </div>
         <div class="modal-section">
-          <h4 class="modal-section-title">Hasil Penilaian:</h4>
+          <h4 class="modal-section-title" id="modal-label-feedback">Hasil Penilaian:</h4>
           <p class="modal-text" id="modal-feedback-text">Feedback detail...</p>
         </div>
         <div class="modal-section modal-tips-section">
-          <h4 class="modal-section-title">💡 Tips & Contoh yang Bagus:</h4>
+          <h4 class="modal-section-title" id="modal-label-tips">💡 Tips & Contoh yang Bagus:</h4>
           <p class="modal-text" id="modal-tips-text">Tips detail...</p>
         </div>
       </div>
@@ -1242,8 +2079,348 @@
     let activeWords = [];
     let evaluationData = {};
 
+    let currentLang = localStorage.getItem('lang') || 'id';
+    let targetWordCount = parseInt(localStorage.getItem('wordCount')) || 6;
+    let darkMode = localStorage.getItem('darkMode') === 'true';
+
+    // Set initial dark mode on page render
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+    }
+
+    const i18n = {
+      id: {
+        mudah: "mudah",
+        sedang: "sedang",
+        sulit: "sulit",
+        labelLevel: "Level:",
+        labelWords: "Kata - kata yang harus dipakai:",
+        textChangeWords: "Ganti kata",
+        labelEssay: "Paragraf:",
+        essayPlaceholder: "Rangkai kata-kata di atas menjadi sebuah paragraf yang padu...",
+        btnSubmit: "Nilai tulisanku &rarr;",
+        textLoading: "Menilai esai oleh AI...",
+        textResultsTitle: "Hasil Penilaian:",
+        overallFeedbackLabel: "Feedback Keseluruhan:",
+        btnShare: "Bagikan Tulisan 🚀",
+        btnPlayAgain: "Main Lagi!",
+        welcomeDesc: "Tenun kata tak berhubungan menjadi paragraf utuh",
+        welcomeStartBtn: "Mulai!",
+        welcomeSubtext: "klik tombol untuk bermain",
+        tutorialTitle: "Cara Bermain",
+        tutorialBtnClose: "Mulai Bermain!",
+        settingsTitle: "Pengaturan Game",
+        settingsLabelWordcount: "Jumlah kata yang diberikan:",
+        settingsSaveBtn: "Simpan & Mulai Baru",
+        titleKoherensi: "Koherensi",
+        titleKebahasaan: "Kebahasaan",
+        titleKreativitas: "Kreativitas",
+        titlePenggunaanKata: "Penggunaan Kata",
+        readMore: "Baca selengkapnya",
+        modalLabelScore: "Nilai:",
+        modalLabelFeedback: "Hasil Penilaian:",
+        modalLabelTips: "💡 Tips & Contoh yang Bagus:",
+        noTipsMsg: "Tidak ada tips khusus.",
+        feedbackKoherensiInit: "Penilaian koherensi akan muncul di sini.",
+        feedbackKebahasaanInit: "Penilaian kebahasaan akan muncul di sini.",
+        feedbackKreativitasInit: "Penilaian kreativitas akan muncul di sini.",
+        feedbackPenggunaanKataInit: "Penilaian ketepatan kata akan muncul di sini.",
+        overallFeedbackInit: "Memuat penilaian...",
+        textGeneratingImage: "Membuat gambar...",
+        btnDownloadImg: "📥 Download Gambar",
+        btnCopyCaption: "📋 Salin Caption",
+        copiedSuccess: "✅ Disalin!",
+        shareCaptionText: "Ayo tes kemampuanmu merangkai kata di weavewords.fun!",
+        captionCopied: "Caption berhasil disalin! 📋",
+        loadingWords: "Mengambil kata baru...",
+        failedWords: "Gagal mengambil kata. Coba lagi.",
+        wordCountSuffix: " kata",
+        emptyEssayErr: "Kamu belum menulis apapun!",
+        incompleteWordsErr: "Ayo coba gunakan semua kata yang tersedia!",
+        evalFailErr: "Terjadi kesalahan saat menilai: ",
+        connErr: "Terjadi kesalahan koneksi. Pastikan server berjalan.",
+        tutorialHTML: `
+          <ol class="tutorial-steps">
+            <li>Pilih tingkat kesulitan yang diinginkan (<strong>Mudah</strong>, <strong>Sedang</strong>, atau <strong>Sulit</strong>).</li>
+            <li>Perhatikan kata-kata yang diberikan pada bagian <em>Kata-kata yang harus dipakai</em>. Jika ingin tantangan baru, klik tombol <strong>Ganti Kata</strong>.</li>
+            <li>Tulis sebuah paragraf yang menggunakan seluruh kata yang telah disediakan. Pastikan kalimat tersusun dengan baik dan memiliki hubungan yang jelas.</li>
+            <li>Setelah selesai menulis, klik tombol <strong>Nilai Tulisanku</strong> untuk mengirimkan paragraf kepada sistem.</li>
+            <li>Sistem akan menganalisis tulisan berdasarkan beberapa aspek:
+              <ul class="tutorial-sublist">
+                <li><strong>Koherensi</strong> (keterkaitan antar kalimat)</li>
+                <li><strong>Kebahasaan</strong></li>
+                <li><strong>Kreativitas</strong></li>
+                <li><strong>Penggunaan kata</strong> yang diberikan</li>
+              </ul>
+            </li>
+            <li>Lihat hasil penilaian dan umpan balik yang diberikan untuk mengetahui kelebihan serta bagian yang dapat ditingkatkan.</li>
+            <li>Setelah memperoleh hasil, kamu dapat membagikan atau mengunduh hasil tulisanmu.</li>
+          </ol>
+          <h3 class="tutorial-section-title">Tips Mendapatkan Nilai Tinggi</h3>
+          <ul class="tutorial-tips">
+            <li>Gunakan seluruh kata yang diberikan secara alami.</li>
+            <li>Buat paragraf yang memiliki alur yang jelas.</li>
+            <li>Perhatikan ejaan dan tanda baca.</li>
+            <li>Gunakan ide yang kreatif dan menarik.</li>
+            <li>Hindari memasukkan kata secara acak tanpa hubungan yang jelas.</li>
+          </ul>
+          <div class="tutorial-goal-box">
+            <strong>Tujuan permainan:</strong> menyusun paragraf yang kreatif, koheren, dan mampu mengintegrasikan seluruh kata yang diberikan dengan baik.
+          </div>
+        `
+      },
+      en: {
+        mudah: "easy",
+        sedang: "medium",
+        sulit: "hard",
+        labelLevel: "Level:",
+        labelWords: "Words to include:",
+        textChangeWords: "Change words",
+        labelEssay: "Paragraph:",
+        essayPlaceholder: "Weave the words above into a cohesive paragraph...",
+        btnSubmit: "Grade my writing &rarr;",
+        textLoading: "Grading essay by AI...",
+        textResultsTitle: "Evaluation Results:",
+        overallFeedbackLabel: "Overall Feedback:",
+        btnShare: "Share Writing 🚀",
+        btnPlayAgain: "Play Again!",
+        welcomeDesc: "Weave unrelated words into a cohesive paragraph",
+        welcomeStartBtn: "Start!",
+        welcomeSubtext: "click the button to play",
+        tutorialTitle: "How to Play",
+        tutorialBtnClose: "Start Playing!",
+        settingsTitle: "Game Settings",
+        settingsLabelWordcount: "Number of words to include:",
+        settingsSaveBtn: "Save & Restart",
+        captionCopied: "Caption copied successfully! 📋",
+        loadingWords: "Fetching new words...",
+        titleKoherensi: "Coherence",
+        titleKebahasaan: "Grammar & Language",
+        titleKreativitas: "Creativity",
+        titlePenggunaanKata: "Word Usage",
+        readMore: "Read more",
+        modalLabelScore: "Score:",
+        modalLabelFeedback: "Evaluation Result:",
+        modalLabelTips: "💡 Tips & Good Examples:",
+        noTipsMsg: "No specific tips available.",
+        feedbackKoherensiInit: "Coherence evaluation will appear here.",
+        feedbackKebahasaanInit: "Grammar evaluation will appear here.",
+        feedbackKreativitasInit: "Creativity evaluation will appear here.",
+        feedbackPenggunaanKataInit: "Word usage evaluation will appear here.",
+        overallFeedbackInit: "Loading evaluation...",
+        textGeneratingImage: "Generating image...",
+        btnDownloadImg: "📥 Download Image",
+        btnCopyCaption: "📋 Copy Caption",
+        copiedSuccess: "✅ Copied!",
+        shareCaptionText: "Come test your word-weaving skills at weavewords.fun!",
+        failedWords: "Failed to fetch words. Try again.",
+        wordCountSuffix: " words",
+        emptyEssayErr: "You haven't written anything yet!",
+        incompleteWordsErr: "Try to use all the available words!",
+        evalFailErr: "An error occurred while grading: ",
+        connErr: "Connection error. Make sure the server is running.",
+        tutorialHTML: `
+          <ol class="tutorial-steps">
+            <li>Select your preferred difficulty level (<strong>Easy</strong>, <strong>Medium</strong>, or <strong>Hard</strong>).</li>
+            <li>Pay attention to the words provided in the <em>Words to include</em> section. For new challenges, click <strong>Change words</strong>.</li>
+            <li>Write a paragraph that incorporates all the provided words. Make sure sentences are well-structured and logical.</li>
+            <li>Once done, click <strong>Grade my writing</strong> to send your paragraph to the system.</li>
+            <li>The system will analyze your writing based on several aspects:
+              <ul class="tutorial-sublist">
+                <li><strong>Coherence</strong> (sentence connections)</li>
+                <li><strong>Grammar & Language</strong></li>
+                <li><strong>Creativity</strong></li>
+                <li><strong>Word Usage</strong> of the given words</li>
+              </ul>
+            </li>
+            <li>View the grading and feedback provided to identify strengths and areas of improvement.</li>
+            <li>After getting results, you can share or download your writing.</li>
+          </ol>
+          <h3 class="tutorial-section-title">Tips to Get a High Score</h3>
+          <ul class="tutorial-tips">
+            <li>Use all provided words naturally.</li>
+            <li>Create a paragraph with a clear flow.</li>
+            <li>Pay attention to spelling and punctuation.</li>
+            <li>Use creative and engaging ideas.</li>
+            <li>Avoid stuffing words randomly without a clear context.</li>
+          </ul>
+          <div class="tutorial-goal-box">
+            <strong>Game goal:</strong> compose a paragraph that is creative, coherent, and integrates all provided words beautifully.
+          </div>
+        `
+      }
+    };
+
+    function applyTranslations() {
+      const texts = i18n[currentLang];
+      
+      // Update UI elements
+      document.getElementById('label-level').textContent = texts.labelLevel;
+      document.getElementById('label-words').textContent = texts.labelWords;
+      document.getElementById('text-change-words').textContent = texts.textChangeWords;
+      document.getElementById('label-essay').textContent = texts.labelEssay;
+      document.getElementById('essay-input').placeholder = texts.essayPlaceholder;
+      document.getElementById('btn-submit').innerHTML = texts.btnSubmit;
+      document.getElementById('text-loading').textContent = texts.textLoading;
+      document.getElementById('text-results-title').textContent = texts.textResultsTitle;
+      document.querySelector('.overall-feedback-container .overall-title').textContent = texts.overallFeedbackLabel;
+      
+      // Welcome Modal
+      document.querySelector('#welcome-backdrop .welcome-description').textContent = texts.welcomeDesc;
+      document.querySelector('#welcome-backdrop .welcome-btn-start').textContent = texts.welcomeStartBtn;
+      document.querySelector('#welcome-backdrop .welcome-subtext').textContent = texts.welcomeSubtext;
+      
+      // Sync Welcome lang buttons active class
+      const idBtn = document.getElementById('welcome-lang-id');
+      const enBtn = document.getElementById('welcome-lang-en');
+      if (idBtn && enBtn) {
+        if (currentLang === 'id') {
+          idBtn.classList.add('active');
+          enBtn.classList.remove('active');
+        } else {
+          idBtn.classList.remove('active');
+          enBtn.classList.add('active');
+        }
+      }
+
+        // Results Card Titles
+        document.getElementById('title-koherensi').textContent = texts.titleKoherensi;
+        document.getElementById('title-kebahasaan').textContent = texts.titleKebahasaan;
+        document.getElementById('title-kreativitas').textContent = texts.titleKreativitas;
+        document.getElementById('title-penggunaan_kata').textContent = texts.titlePenggunaanKata;
+
+        // Results Card Read More Buttons
+        document.getElementById('readmore-koherensi').textContent = texts.readMore;
+        document.getElementById('readmore-kebahasaan').textContent = texts.readMore;
+        document.getElementById('readmore-kreativitas').textContent = texts.readMore;
+        document.getElementById('readmore-penggunaan_kata').textContent = texts.readMore;
+
+        // New Results Card Right Column Texts
+        document.getElementById('text-generating-image').textContent = texts.textGeneratingImage;
+        document.getElementById('btn-download-img').textContent = texts.btnDownloadImg;
+        document.getElementById('btn-copy-caption-results').textContent = texts.btnCopyCaption;
+        document.getElementById('btn-play-again-results').textContent = texts.btnPlayAgain;
+
+        // Detail Modal Labels
+        document.getElementById('modal-label-score').textContent = texts.modalLabelScore;
+        document.getElementById('modal-label-feedback').textContent = texts.modalLabelFeedback;
+        document.getElementById('modal-label-tips').textContent = texts.modalLabelTips;
+
+        // Initial Card Placeholder Descriptions (only if evaluationData is empty)
+        if (!evaluationData || Object.keys(evaluationData).length === 0) {
+          document.getElementById('feedback-koherensi').textContent = texts.feedbackKoherensiInit;
+          document.getElementById('feedback-kebahasaan').textContent = texts.feedbackKebahasaanInit;
+          document.getElementById('feedback-kreativitas').textContent = texts.feedbackKreativitasInit;
+          document.getElementById('feedback-penggunaan_kata').textContent = texts.feedbackPenggunaanKataInit;
+          document.getElementById('overall-feedback-text').textContent = texts.overallFeedbackInit;
+        }
+
+      // Tutorial Modal
+      document.querySelector('#tutorial-backdrop .tutorial-title').textContent = texts.tutorialTitle;
+      document.querySelector('#tutorial-backdrop .tutorial-content-scroll').innerHTML = texts.tutorialHTML;
+      document.querySelector('#tutorial-backdrop .tutorial-btn-close').textContent = texts.tutorialBtnClose;
+
+      // Settings Modal
+      document.getElementById('settings-title').textContent = texts.settingsTitle;
+      document.getElementById('settings-label-wordcount').textContent = texts.settingsLabelWordcount;
+      document.getElementById('settings-save-btn').textContent = texts.settingsSaveBtn;
+      document.getElementById('toast-notification').textContent = texts.captionCopied;
+
+      // Translate difficulty level buttons
+      const mudahBtn = document.querySelector('.btn-level[data-level="mudah"]');
+      const sedangBtn = document.querySelector('.btn-level[data-level="sedang"]');
+      const sulitBtn = document.querySelector('.btn-level[data-level="sulit"]');
+      if (mudahBtn) mudahBtn.textContent = texts.mudah;
+      if (sedangBtn) sedangBtn.textContent = texts.sedang;
+      if (sulitBtn) sulitBtn.textContent = texts.sulit;
+
+      // Update flag & initials in header button
+      const flagMap = { id: 'https://flagcdn.com/w20/id.png', en: 'https://flagcdn.com/w20/gb.png' };
+      document.getElementById('current-lang-flag').src = flagMap[currentLang];
+      document.getElementById('current-lang-text').textContent = currentLang.toUpperCase();
+    }
+
+    function updateLogo() {
+      const logoImg = document.getElementById('app-logo');
+      if (logoImg) {
+        logoImg.src = darkMode ? '/static/logo-dark.png' : '/static/logo.png';
+      }
+      const welcomeLogo = document.querySelector('.welcome-logo');
+      if (welcomeLogo) {
+        welcomeLogo.src = '/static/logo.png';
+      }
+    }
+
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      localStorage.setItem('darkMode', darkMode);
+      if (darkMode) {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
+      updateLogo();
+    }
+
+    function toggleLangDropdown(event) {
+      event.stopPropagation();
+      document.getElementById('lang-dropdown').classList.toggle('show');
+    }
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', currentLang);
+      document.getElementById('lang-dropdown').classList.remove('show');
+      applyTranslations();
+      fetchNewWords();
+    }
+
+    function openSettingsModal() {
+      document.getElementById('word-count-val').textContent = targetWordCount;
+      const backdrop = document.getElementById('settings-modal-backdrop');
+      if (backdrop) {
+        backdrop.style.display = 'flex';
+        backdrop.offsetHeight;
+        backdrop.classList.add('active');
+      }
+    }
+
+    function closeSettingsModal() {
+      const backdrop = document.getElementById('settings-modal-backdrop');
+      if (backdrop) {
+        backdrop.classList.remove('active');
+        setTimeout(() => {
+          backdrop.style.display = 'none';
+        }, 400);
+      }
+    }
+
+    function adjustWordCount(amount) {
+      let val = parseInt(document.getElementById('word-count-val').textContent);
+      val += amount;
+      if (val >= 3 && val <= 10) {
+        document.getElementById('word-count-val').textContent = val;
+      }
+    }
+
+    // Close dropdown on click outside
+    window.addEventListener('click', () => {
+      const dropdown = document.getElementById('lang-dropdown');
+      if (dropdown) dropdown.classList.remove('show');
+    });
+
+    function saveSettings() {
+      const val = parseInt(document.getElementById('word-count-val').textContent);
+      targetWordCount = val;
+      localStorage.setItem('wordCount', targetWordCount);
+      closeSettingsModal();
+      fetchNewWords();
+    }
+
     // Initialize game on load
     window.addEventListener('DOMContentLoaded', () => {
+      updateLogo();
+      applyTranslations();
       selectLevel('mudah');
     });
 
@@ -1263,25 +2440,22 @@
       fetchNewWords();
     }
 
-    // Fetch 5 random words from backend based on active level
-    // Fetch 6 random words from backend based on active level
+    // Fetch random words from backend based on active level and settings
     function fetchNewWords() {
       const wordsListEl = document.getElementById('words-list');
-      wordsListEl.innerHTML = '<div style="color: var(--text-muted); font-size:14px; font-weight:600; width:100%; text-align:center;">Mengambil kata baru...</div>';
+      const texts = i18n[currentLang];
+      wordsListEl.innerHTML = `<div style="color: var(--text-muted); font-size:14px; font-weight:600; width:100%; text-align:center;">${texts.loadingWords}</div>`;
 
       // Clear textarea, results & reset submit button
       document.getElementById('essay-input').value = '';
-      document.getElementById('word-counter').textContent = '0 kata';
+      document.getElementById('essay-input').style.height = '140px';
+      document.getElementById('word-counter').textContent = '0' + texts.wordCountSuffix;
       document.getElementById('btn-submit').classList.add('incomplete');
       document.getElementById('loading-container').style.display = 'none';
 
-      const resultsSection = document.getElementById('results-section');
-      resultsSection.classList.remove('active');
-      setTimeout(() => {
-        resultsSection.style.display = 'none';
-      }, 300);
+      closeResultsModal();
 
-      fetch(`/kata-acak?tingkat=${currentLevel}`)
+      fetch(`/kata-acak?tingkat=${currentLevel}&lang=${currentLang}&jumlah=${targetWordCount}`)
         .then(res => res.json())
         .then(data => {
           activeWords = data.kata;
@@ -1290,7 +2464,7 @@
         })
         .catch(err => {
           console.error('Error fetching words:', err);
-          wordsListEl.innerHTML = '<div style="color: red; font-size:14px; font-weight:600; width:100%; text-align:center;">Gagal mengambil kata. Coba lagi.</div>';
+          wordsListEl.innerHTML = `<div style="color: red; font-size:14px; font-weight:600; width:100%; text-align:center;">${texts.failedWords}</div>`;
         });
     }
 
@@ -1305,23 +2479,29 @@
   `).join('');
     }
 
+    // Auto-grow textarea height and check word usage on input
+    function onEssayInput() {
+      checkWordUsage();
+      const essayInput = document.getElementById('essay-input');
+      essayInput.style.height = '140px';
+      essayInput.style.height = (essayInput.scrollHeight) + 'px';
+    }
+
     // Check word usage in textarea in real-time
     function checkWordUsage() {
       const errorEl = document.getElementById('error-popup');
       if (errorEl) errorEl.classList.remove('show');
 
       const text = document.getElementById('essay-input').value;
+      const texts = i18n[currentLang];
 
       // Calculate text word count
       const wordsArray = text.trim().split(/\s+/).filter(Boolean);
-      document.getElementById('word-counter').textContent = wordsArray.length + ' kata';
+      document.getElementById('word-counter').textContent = wordsArray.length + texts.wordCountSuffix;
 
-      // Lowercase normalized check with affixes (imbuhan) support (alphanumeric only)
+      // Lowercase normalized check with affixes support (alphanumeric only)
       const cleanText = text.toLowerCase().replace(/[^a-zA-Z0-9\s]/g, " ");
       const cleanWords = cleanText.split(/\s+/).filter(Boolean);
-
-      console.log("cleanWords:", cleanWords);
-      console.log("activeWords:", activeWords);
 
       let usedWordsCount = 0;
 
@@ -1329,17 +2509,13 @@
         const chipEl = document.getElementById(`chip-${word}`);
         if (chipEl) {
           const lowerWord = word.toLowerCase();
-          // Check if any word in the text contains the target word as a substring
           const isUsed = cleanWords.some(w => w.includes(lowerWord));
-          console.log(`Word: ${word}, Lower: ${lowerWord}, isUsed: ${isUsed}`);
           if (isUsed) {
             chipEl.classList.add('used');
             usedWordsCount++;
           } else {
             chipEl.classList.remove('used');
           }
-        } else {
-          console.warn(`Element chip-${word} not found!`);
         }
       });
 
@@ -1356,8 +2532,10 @@
     function submitEssay() {
       const errorEl = document.getElementById('error-popup');
       const essay = document.getElementById('essay-input').value.trim();
+      const texts = i18n[currentLang];
+      
       if (!essay) {
-        errorEl.textContent = "Kamu belum menulis apapun!";
+        errorEl.textContent = texts.emptyEssayErr;
         errorEl.classList.add('show');
         return;
       }
@@ -1375,7 +2553,7 @@
       });
 
       if (usedWordsCount < activeWords.length) {
-        errorEl.textContent = "Ayo coba gunakan semua kata yang tersedia!";
+        errorEl.textContent = texts.incompleteWordsErr;
         errorEl.classList.add('show');
         return;
       }
@@ -1397,7 +2575,7 @@
       fetch('/nilai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ esai: essay, kata: activeWords })
+        body: JSON.stringify({ esai: essay, kata: activeWords, lang: currentLang })
       })
         .then(res => res.json())
         .then(data => {
@@ -1406,13 +2584,13 @@
           if (data.status === 'success') {
             displayResults(data);
           } else {
-            alert('Terjadi kesalahan saat menilai: ' + (data.error || 'Server error'));
+            alert(texts.evalFailErr + (data.error || 'Server error'));
           }
         })
         .catch(err => {
           document.getElementById('loading-container').style.display = 'none';
           console.error('API Error:', err);
-          alert('Terjadi kesalahan koneksi. Pastikan server berjalan.');
+          alert(texts.connErr);
         });
     }
 
@@ -1420,7 +2598,17 @@
     function displayResults(data) {
       evaluationData = data;
       const resultsSection = document.getElementById('results-section');
-      resultsSection.style.display = 'block';
+      resultsSection.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+
+      // Fire confetti burst!
+      confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#4658cc', '#38bdf8', '#45c496', '#FFF08A', '#fd5949'],
+        zIndex: 16000
+      });
 
       // Set card feedback descriptions
       document.getElementById('feedback-koherensi').textContent = data.koherensi.feedback;
@@ -1436,6 +2624,41 @@
       animateGauge('kebahasaan', data.kebahasaan.skor, data.kebahasaan.max_skor);
       animateGauge('kreativitas', data.kreativitas.skor, data.kreativitas.max_skor);
       animateGauge('penggunaan_kata', data.penggunaan_kata.skor, data.penggunaan_kata.max_skor);
+
+      // Reset share preview state & automatically generate card image
+      document.getElementById('share-preview-loading').style.display = 'flex';
+      const resultsPreviewImg = document.getElementById('results-share-preview');
+      resultsPreviewImg.src = '';
+      resultsPreviewImg.style.display = 'none';
+
+      // Set content for hidden share card
+      const essayText = document.getElementById('essay-input').value.trim();
+      const textBox = document.getElementById('share-essay-text');
+      textBox.textContent = essayText;
+
+      // Adjust font size roughly based on text length
+      textBox.style.fontSize = '32px';
+      if (essayText.length > 200) textBox.style.fontSize = '28px';
+      if (essayText.length > 350) textBox.style.fontSize = '24px';
+      if (essayText.length > 500) textBox.style.fontSize = '20px';
+
+      const shareCard = document.getElementById('share-card');
+
+      html2canvas(shareCard, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null
+      }).then(canvas => {
+        generatedShareImageDataUrl = canvas.toDataURL('image/png');
+        resultsPreviewImg.src = generatedShareImageDataUrl;
+        resultsPreviewImg.style.display = 'block';
+        document.getElementById('share-preview-loading').style.display = 'none';
+      }).catch(err => {
+        console.error("Error generating automatic share image:", err);
+        document.getElementById('share-preview-loading').innerHTML = `
+          <span style="color: red; font-size: 13px;">⚠️ Gagal memproses gambar</span>
+        `;
+      });
 
       // Trigger slide-in transition
       setTimeout(() => {
@@ -1482,12 +2705,13 @@
     function openModal(category) {
       if (!evaluationData || !evaluationData[category]) return;
       const catData = evaluationData[category];
+      const texts = i18n[currentLang];
 
       const titles = {
-        'koherensi': 'Koherensi',
-        'kebahasaan': 'Kebahasaan',
-        'kreativitas': 'Kreativitas',
-        'penggunaan_kata': 'Penggunaan Kata'
+        'koherensi': texts.titleKoherensi,
+        'kebahasaan': texts.titleKebahasaan,
+        'kreativitas': texts.titleKreativitas,
+        'penggunaan_kata': texts.titlePenggunaanKata
       };
 
       document.getElementById('modal-title').textContent = titles[category] || category;
@@ -1495,7 +2719,7 @@
       const percentage = Math.round((catData.skor / catData.max_skor) * 100);
       document.getElementById('modal-score').textContent = `${percentage}% (${catData.skor}/${catData.max_skor})`;
       document.getElementById('modal-feedback-text').textContent = catData.feedback;
-      document.getElementById('modal-tips-text').textContent = catData.tips || 'Tidak ada tips khusus.';
+      document.getElementById('modal-tips-text').textContent = catData.tips || texts.noTipsMsg;
 
       document.getElementById('modal-backdrop').classList.add('active');
     }
@@ -1505,69 +2729,39 @@
       document.getElementById('modal-backdrop').classList.remove('active');
     }
 
+    // Close results overlay modal
+    function closeResultsModal() {
+      const resultsSection = document.getElementById('results-section');
+      if (resultsSection) {
+        resultsSection.classList.remove('active');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+          resultsSection.style.display = 'none';
+        }, 400);
+      }
+    }
+
     // Close modal on Escape key press
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeModal();
-        closeShareModal();
+        closeResultsModal();
       }
     });
 
     // Reset game back to initial state with new words
     function resetGame() {
-      document.getElementById('essay-input').value = '';
+      closeResultsModal();
+      const essayInput = document.getElementById('essay-input');
+      essayInput.value = '';
+      essayInput.style.height = '140px';
       document.getElementById('btn-submit').classList.add('incomplete');
-      document.getElementById('essay-input').focus();
+      essayInput.focus();
       evaluationData = {};
       fetchNewWords();
     }
 
-    let generatedShareImageBlob = null;
     let generatedShareImageDataUrl = null;
-
-    function openSharePreview() {
-      const btnShare = document.getElementById('btn-share');
-      btnShare.disabled = true;
-      const originalText = btnShare.innerHTML;
-      btnShare.innerHTML = "Memproses... ⏳";
-
-      const essayText = document.getElementById('essay-input').value.trim();
-      const textBox = document.getElementById('share-essay-text');
-      textBox.textContent = essayText;
-
-      // Adjust font size roughly based on text length
-      textBox.style.fontSize = '32px';
-      if (essayText.length > 200) textBox.style.fontSize = '28px';
-      if (essayText.length > 350) textBox.style.fontSize = '24px';
-      if (essayText.length > 500) textBox.style.fontSize = '20px';
-
-      const shareCard = document.getElementById('share-card');
-
-      html2canvas(shareCard, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: null
-      }).then(canvas => {
-        generatedShareImageDataUrl = canvas.toDataURL('image/png');
-        document.getElementById('share-preview-image').src = generatedShareImageDataUrl;
-
-        document.getElementById('share-modal-backdrop').classList.add('active');
-        document.body.style.overflow = 'hidden';
-
-        btnShare.innerHTML = originalText;
-        btnShare.disabled = false;
-      }).catch(err => {
-        console.error("Error generating image:", err);
-        alert("Gagal membuat gambar. Coba lagi.");
-        btnShare.innerHTML = originalText;
-        btnShare.disabled = false;
-      });
-    }
-
-    function closeShareModal() {
-      document.getElementById('share-modal-backdrop').classList.remove('active');
-      document.body.style.overflow = 'auto';
-    }
 
     function downloadImageDirectly() {
       if (!generatedShareImageDataUrl) return;
@@ -1578,8 +2772,9 @@
     }
 
     async function copyCaptionOnly() {
-      const caption = "Ayo tes kemampuanmu merangkai kata di weavewords.fun!";
-      const btn = document.getElementById('btn-copy-caption');
+      const texts = i18n[currentLang];
+      const caption = texts.shareCaptionText;
+      const btn = document.getElementById('btn-copy-caption-results');
 
       try {
         await navigator.clipboard.writeText(caption);
@@ -1590,7 +2785,7 @@
 
         // Change button text temporarily
         const originalBtnText = btn.innerHTML;
-        btn.innerHTML = "✅ Disalin!";
+        btn.innerHTML = texts.copiedSuccess;
         btn.style.backgroundColor = "#e6f7f0";
         btn.style.color = "#065f46";
         btn.style.borderColor = "#065f46";
@@ -1606,6 +2801,46 @@
       } catch (err) {
         console.error("Clipboard write failed", err);
         alert("Gagal menyalin caption.");
+      }
+    }
+
+    // Close welcome modal
+    function closeWelcomeModal() {
+      const backdrop = document.getElementById('welcome-backdrop');
+      if (backdrop) {
+        backdrop.classList.remove('active');
+        setTimeout(() => {
+          backdrop.style.display = 'none';
+          openTutorialModal();
+        }, 400); // Sinkron dengan transition CSS opacity
+      }
+    }
+
+    // Show tutorial modal
+    function openTutorialModal() {
+      const backdrop = document.getElementById('welcome-backdrop');
+      if (backdrop) {
+        backdrop.classList.remove('active');
+        backdrop.style.display = 'none';
+      }
+
+      const tutorialBackdrop = document.getElementById('tutorial-backdrop');
+      if (tutorialBackdrop) {
+        tutorialBackdrop.style.display = 'flex';
+        // force reflow
+        tutorialBackdrop.offsetHeight;
+        tutorialBackdrop.classList.add('active');
+      }
+    }
+
+    // Close tutorial modal
+    function closeTutorialModal() {
+      const tutorialBackdrop = document.getElementById('tutorial-backdrop');
+      if (tutorialBackdrop) {
+        tutorialBackdrop.classList.remove('active');
+        setTimeout(() => {
+          tutorialBackdrop.style.display = 'none';
+        }, 400); // Sinkron dengan transition CSS opacity
       }
     }
   </script>
