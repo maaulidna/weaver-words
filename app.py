@@ -94,13 +94,35 @@ def nilai():
         esai = data.get('esai', '')
         kata = data.get('kata', [])
         lang = data.get('lang', 'id')
+        tema = data.get('tema', 'bebas')
         kata_str = ', '.join(kata)
+
+        tema_map = {
+            'id': {
+                'bebas': 'Bebas',
+                'filosofis': 'Filosofis (Filsafat)',
+                'fiksi_ilmiah': 'Fiksi Ilmiah (Science Fiction)',
+                'misteri': 'Misteri / Detektif',
+                'romantis': 'Romantis (Percintaan)'
+            },
+            'en': {
+                'bebas': 'Free Theme / General',
+                'filosofis': 'Philosophical',
+                'fiksi_ilmiah': 'Science Fiction',
+                'misteri': 'Mystery / Detective',
+                'romantis': 'Romance / Drama'
+            }
+        }
+        
+        tema_display_id = tema_map['id'].get(tema, 'Bebas')
+        tema_display_en = tema_map['en'].get(tema, 'Free Theme / General')
 
         if lang == 'en':
             prompt = f"""You are a professional essay evaluator.
             
-            Task: Weave these random words into a cohesive paragraph.
+            Task: Weave these random words into a cohesive paragraph based on the specified writing theme.
             Random words provided: {kata_str}
+            Writing Theme: {tema_display_en}
             
             Essay written by user:
             \"\"\"{esai}\"\"\"
@@ -108,7 +130,7 @@ def nilai():
             Grade this essay based on these 4 dimensions:
             1. Coherence (0-25): Measures connection and paragraph flow.
             2. Grammar & Language (0-25): Measures grammatical accuracy, spelling, punctuation, and sentence effectiveness.
-            3. Creativity (0-30): Measures uniqueness of ideas, word connections, and storytelling style.
+            3. Creativity (0-30): Measures uniqueness of ideas, word connections, storytelling style, and how well the essay follows the selected theme '{tema_display_en}'.
             4. Word Usage (0-20): Measures accuracy of using the given random words. English affixes/inflections (e.g. "bicycles", "bicycling", "cycled" for "bicycle") are allowed.
             
             CRITICAL REQUIREMENT: Since the essay is written in English and the user requested the English interface, your entire evaluation and all text values inside the JSON object (specifically "feedback", "tips", and "feedback_umum") MUST be written strictly in English. Do NOT write in Indonesian or use Indonesian phrases in the text values.
@@ -145,8 +167,9 @@ def nilai():
         else:
             prompt = f"""Kamu adalah penilai esai profesional berbahasa Indonesia.
             
-            Tugas pengguna: merangkai kata-kata acak berikut menjadi sebuah esai atau paragraf yang padu.
+            Tugas pengguna: merangkai kata-kata acak berikut menjadi sebuah esai atau paragraf yang padu sesuai dengan tema penulisan yang dipilih.
             Kata acak yang diberikan: {kata_str}
+            Tema Penulisan: {tema_display_id}
             
             Esai yang ditulis pengguna:
             \"\"\"{esai}\"\"\"
@@ -154,7 +177,7 @@ def nilai():
             Nilai esai ini berdasarkan 4 dimensi berikut:
             1. Koherensi (0-25): Mengukur perpaduan dan kelancaran alur paragraf.
             2. Kebahasaan (0-25): Mengukur kesesuaian tata bahasa, ejaan, tanda baca, dan efektivitas kalimat.
-            3. Kreativitas (0-30): Mengukur keunikan ide, cara menghubungkan kata, dan gaya bercerita.
+            3. Kreativitas (0-30): Mengukur keunikan ide, cara menghubungkan kata, gaya bercerita, serta seberapa baik esai mengikuti tema penulisan '{tema_display_id}' yang dipilih.
             4. Penggunaan Kata (0-20): Mengukur ketepatan pemakaian kata-kata acak yang ditentukan dalam konteks kalimat. Kata-kata tersebut diperbolehkan menggunakan imbuhan bahasa Indonesia (awalan/akhiran/sisipan/gabungan, misalnya jika kata dasarnya "sepeda", maka kata "bersepeda", "sepedanya", dll. tetap dianggap terpakai secara sah).
             
             Berikan respons HANYA dalam format JSON dengan skema objek berikut (tanpa markdown code block, tanpa penjelasan tambahan):

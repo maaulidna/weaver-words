@@ -252,6 +252,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
+      cursor: pointer;
     }
 
     .word-chip.used {
@@ -272,7 +273,7 @@
 
     /* Writing Section */
     .writing-section {
-      margin-bottom: 32px;
+      margin-bottom: 0px;
     }
 
     .writing-header {
@@ -1058,6 +1059,7 @@
         flex-direction: column;
         gap: 24px;
       }
+
       .results-right-col {
         min-width: 100%;
       }
@@ -1195,14 +1197,17 @@
     .tutorial-content-scroll::-webkit-scrollbar {
       width: 6px;
     }
+
     .tutorial-content-scroll::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.03);
       border-radius: 3px;
     }
+
     .tutorial-content-scroll::-webkit-scrollbar-thumb {
       background: rgba(70, 88, 204, 0.2);
       border-radius: 3px;
     }
+
     .tutorial-content-scroll::-webkit-scrollbar-thumb:hover {
       background: rgba(70, 88, 204, 0.4);
     }
@@ -1300,7 +1305,8 @@
       line-height: 1.45;
       margin-bottom: 24px;
       max-width: 340px;
-      text-align: center; /* Rata tengah */
+      text-align: center;
+      /* Rata tengah */
     }
 
     .welcome-lang-selector {
@@ -1371,9 +1377,11 @@
       0% {
         transform: scale(1);
       }
+
       50% {
         transform: scale(1.06);
       }
+
       100% {
         transform: scale(1);
       }
@@ -1398,7 +1406,7 @@
       --results-card-bg: #1e293b;
       --results-card-border: #334155;
       --results-text: #cbd5e1;
-      
+
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
       --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.3);
       --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
@@ -1554,6 +1562,7 @@
         opacity: 0;
         transform: translateY(-6px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -1568,7 +1577,7 @@
       border-radius: 24px;
       box-shadow: var(--shadow-lg);
       width: 90%;
-      max-width: 440px;
+      max-width: 480px;
       padding: 28px;
       border: 1.5px solid var(--border-color);
       transform: scale(0.9);
@@ -1581,37 +1590,42 @@
     }
 
     .settings-row {
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
     }
 
     .settings-label {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 700;
       color: var(--text-main);
+      max-width: 240px;
+      text-align: left;
     }
 
     .word-count-controls {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 14px;
+      gap: 10px;
       background-color: var(--bg-body);
       border: 1.5px solid var(--border-color);
-      padding: 10px;
-      border-radius: 16px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      width: 240px;
+      box-sizing: border-box;
+      justify-content: space-between;
     }
 
     .word-count-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
       border: none;
       background-color: var(--bg-card);
       color: var(--primary);
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
@@ -1627,11 +1641,157 @@
     }
 
     .word-count-value {
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--text-main);
-      min-width: 32px;
+      min-width: 24px;
       text-align: center;
+    }
+
+    .theme-controls,
+    .time-mode-controls {
+      display: flex;
+      gap: 4px;
+      background-color: var(--bg-body);
+      border: 1.5px solid var(--border-color);
+      padding: 4px;
+      border-radius: 12px;
+      width: 240px;
+      box-sizing: border-box;
+    }
+
+    .theme-btn,
+    .time-mode-btn {
+      flex: 1;
+      min-width: 0;
+      padding: 6px 4px;
+      border-radius: 8px;
+      border: none;
+      background-color: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .time-mode-btn {
+      font-size: 11px;
+    }
+
+    .theme-btn.active,
+    .time-mode-btn.active {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    body.dark-mode .theme-btn.active,
+    body.dark-mode .time-mode-btn.active {
+      background-color: #38bdf8;
+      color: #0b0f19;
+    }
+
+    #time-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      background-color: var(--results-card-bg);
+      border: 1px solid var(--results-card-border);
+      padding: 4px 12px;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    body.dark-mode #time-display {
+      color: #38bdf8;
+      background-color: rgba(56, 189, 248, 0.1);
+      border-color: rgba(56, 189, 248, 0.2);
+    }
+
+    #time-display.warning {
+      color: #ef4444;
+      background-color: #fef2f2;
+      border-color: #fecaca;
+      animation: pulse-red 1s infinite;
+    }
+
+    body.dark-mode #time-display.warning {
+      color: #f87171;
+      background-color: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    @keyframes pulse-red {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.6;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .settings-select,
+    .settings-input-num {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border-color);
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      outline: none;
+      transition: var(--transition);
+      box-sizing: border-box;
+      width: 240px;
+      text-align-last: center;
+    }
+
+    .settings-select:focus,
+    .settings-input-num:focus {
+      border-color: var(--primary);
+    }
+
+    body.dark-mode .settings-select,
+    body.dark-mode .settings-input-num {
+      border-color: #334155;
+      background-color: #0b0f19;
+      color: #cbd5e1;
+    }
+
+    .time-duration-input-wrapper {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      width: 240px;
+      justify-content: center;
+    }
+
+    /* Lock all settings controls to exact identical widths and prevent browser squeezing */
+    .word-count-controls,
+    .theme-controls,
+    .time-mode-controls,
+    .settings-select,
+    #settings-input-minwords,
+    .time-duration-input-wrapper {
+      width: 260px !important;
+      min-width: 260px !important;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
     }
 
     .btn-settings-save {
@@ -1715,54 +1875,87 @@
       .welcome-card {
         padding: 32px;
       }
+
       .welcome-logo {
         height: 50px;
         margin-bottom: 12px;
       }
+
       .welcome-description {
         font-size: 14px;
         margin-bottom: 16px;
         max-width: 220px;
       }
+
       .welcome-btn-start {
         font-size: 20px;
         padding: 10px 24px;
         border-radius: 12px;
       }
+
       .welcome-subtext {
         font-size: 11px;
         margin-top: 8px;
       }
+
       .tutorial-card {
         padding: 24px 16px !important;
         border-radius: 24px;
       }
+
       .tutorial-title {
         font-size: 20px;
         margin-bottom: 16px;
       }
-      .tutorial-steps, .tutorial-tips {
+
+      .tutorial-steps,
+      .tutorial-tips {
         font-size: 13.5px;
         margin-left: 16px;
       }
+
       .tutorial-goal-box {
         font-size: 13.5px;
         padding: 12px;
       }
-      
+
       /* Settings modal mobile responsive */
       .settings-modal-card {
         padding: 20px 16px;
         border-radius: 20px;
       }
+
+      .settings-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+
+      .settings-label {
+        max-width: 100%;
+      }
+
+      .word-count-controls,
+      .theme-controls,
+      .time-mode-controls,
+      .settings-select,
+      #settings-input-minwords,
+      .time-duration-input-wrapper {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex-shrink: 1 !important;
+      }
+
       .word-count-controls {
         gap: 8px;
         padding: 8px;
       }
+
       .word-count-btn {
         width: 32px;
         height: 32px;
       }
+
       .word-count-value {
         font-size: 18px;
       }
@@ -1777,7 +1970,7 @@
     <div class="welcome-card">
       <img src="/static/logo.png" alt="Weave Words Logo" class="welcome-logo">
       <p class="welcome-description">Tenun kata tak berhubungan menjadi paragraf utuh</p>
-      
+
       <!-- Welcome Lang Selector (Stays Light Mode Styled) -->
       <div class="welcome-lang-selector">
         <button class="welcome-lang-btn active" id="welcome-lang-id" onclick="changeLanguage('id')">
@@ -1820,6 +2013,62 @@
             <button class="word-count-btn" onclick="adjustWordCount(1)">&plus;</button>
           </div>
         </div>
+        <div class="settings-row">
+          <label class="settings-label" id="settings-label-theme">Tema Game:</label>
+          <div class="theme-controls">
+            <button class="theme-btn" id="theme-btn-light" onclick="setThemeModeSetting(false)">Light</button>
+            <button class="theme-btn" id="theme-btn-dark" onclick="setThemeModeSetting(true)">Dark</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label class="settings-label" id="settings-label-timemode">Pengaturan Waktu:</label>
+          <div class="time-mode-controls">
+            <button class="time-mode-btn" id="time-mode-btn-none" onclick="setTimeModeSetting('none')">Tanpa
+              Waktu</button>
+            <button class="time-mode-btn" id="time-mode-btn-timer" onclick="setTimeModeSetting('timer')">Timer</button>
+            <button class="time-mode-btn" id="time-mode-btn-stopwatch"
+              onclick="setTimeModeSetting('stopwatch')">Stopwatch</button>
+          </div>
+        </div>
+        <div class="settings-row" id="timer-duration-row" style="display: none;">
+          <label class="settings-label" id="settings-label-duration">Durasi Timer:</label>
+          <div class="time-duration-input-wrapper">
+            <input type="number" id="settings-input-duration-min" min="0" max="60" value="2" class="settings-input-num"
+              style="width: 100px; text-align: center;">
+            <span style="font-weight: bold; color: var(--text-main);">:</span>
+            <input type="number" id="settings-input-duration-sec" min="0" max="59" value="0" class="settings-input-num"
+              style="width: 100px; text-align: center;">
+          </div>
+        </div>
+        <!-- Minimal Paragraf -->
+        <div class="settings-row">
+          <label class="settings-label" id="settings-label-minparagraphs">Minimal Paragraf (tiap paragraf min. 2
+            kalimat):</label>
+          <select id="settings-select-minparagraphs" class="settings-select">
+            <option value="1">1 Paragraf</option>
+            <option value="2">2 Paragraf</option>
+            <option value="3">3 Paragraf</option>
+            <option value="4">4 Paragraf</option>
+            <option value="5">5 Paragraf</option>
+          </select>
+        </div>
+        <!-- Minimal Kata -->
+        <div class="settings-row">
+          <label class="settings-label" id="settings-label-minwords">Minimal Kata:</label>
+          <input type="number" id="settings-input-minwords" class="settings-input-num" min="0" max="1000" step="5"
+            value="0">
+        </div>
+        <!-- Tema Tulisan -->
+        <div class="settings-row">
+          <label class="settings-label" id="settings-label-writingtheme">Tema Tulisan:</label>
+          <select id="settings-select-writingtheme" class="settings-select">
+            <option value="bebas">Bebas</option>
+            <option value="filosofis">Filosofis</option>
+            <option value="fiksi_ilmiah">Fiksi Ilmiah</option>
+            <option value="misteri">Misteri</option>
+            <option value="romantis">Romantis</option>
+          </select>
+        </div>
         <button class="btn-settings-save" onclick="saveSettings()" id="settings-save-btn">Simpan & Mulai Baru</button>
       </div>
     </div>
@@ -1833,41 +2082,41 @@
           <img src="/static/logo.png" alt="Weave Words Logo" id="app-logo"
             style="height: 60px; display: block; max-width: 100%; object-fit: contain;">
         </div>
-        
+
         <div class="header-controls">
           <!-- Language Selector -->
           <div class="lang-selector">
             <button class="control-btn lang-btn" onclick="toggleLangDropdown(event)">
-              <img id="current-lang-flag" src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;" alt="flag"> <span id="current-lang-text">ID</span>
+              <img id="current-lang-flag" src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;"
+                alt="flag"> <span id="current-lang-text">ID</span>
             </button>
             <div class="lang-dropdown" id="lang-dropdown">
               <div class="lang-option" onclick="changeLanguage('id')">
-                <img src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;" alt="ID"> <span>Indonesia (ID)</span>
+                <img src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;" alt="ID">
+                <span>Indonesia (ID)</span>
               </div>
               <div class="lang-option" onclick="changeLanguage('en')">
-                <img src="https://flagcdn.com/w20/gb.png" width="18" style="border-radius: 2px;" alt="EN"> <span>English (EN)</span>
+                <img src="https://flagcdn.com/w20/gb.png" width="18" style="border-radius: 2px;" alt="EN"> <span>English
+                  (EN)</span>
               </div>
             </div>
           </div>
 
-          <!-- Dark Mode Toggle -->
-          <button class="control-btn" onclick="toggleDarkMode()" title="Toggle Dark Mode" id="btn-dark-mode">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-          </button>
-
           <!-- Settings Button -->
           <button class="control-btn" onclick="openSettingsModal()" title="Pengaturan">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
             </svg>
           </button>
 
           <!-- Help/Tutorial Button -->
           <button class="control-btn" onclick="openTutorialModal()" title="Cara Bermain">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
               <line x1="12" y1="17" x2="12.01" y2="17"></line>
@@ -1903,7 +2152,22 @@
       <div class="writing-section">
         <div class="writing-header">
           <span class="section-label" id="label-essay">Paragraf:</span>
-          <span class="word-counter" id="word-counter">0 kata</span>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span id="time-display" style="display: none;"></span>
+            <span class="word-counter" id="word-counter">0 kata</span>
+          </div>
+        </div>
+        <!-- Settings Info Badges -->
+        <div class="settings-badges-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+          <span class="badge" id="badge-theme"
+            style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background-color: var(--bg-body); border: 1.5px solid var(--border-color); color: var(--text-muted);">Tema:
+            Bebas</span>
+          <span class="badge" id="badge-min-paragraphs"
+            style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background-color: var(--bg-body); border: 1.5px solid var(--border-color); color: var(--text-muted);">Minimal
+            1 Paragraf</span>
+          <span class="badge" id="badge-min-words"
+            style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background-color: var(--bg-body); border: 1.5px solid var(--border-color); color: var(--text-muted); display: none;">Minimal
+            0 Kata</span>
         </div>
         <textarea id="essay-input" placeholder="Rangkai kata-kata di atas menjadi sebuah paragraf yang padu..."
           oninput="onEssayInput()"></textarea>
@@ -1924,9 +2188,10 @@
     <!-- Results Dashboard -->
     <div class="results-section" id="results-section" style="display: none;">
       <div class="results-modal-card">
-        <button class="modal-close" onclick="closeResultsModal()" style="position: absolute; top: 20px; right: 28px;">&times;</button>
+        <button class="modal-close" onclick="closeResultsModal()"
+          style="position: absolute; top: 20px; right: 28px;">&times;</button>
         <h2 class="results-title" id="text-results-title">Hasil Penilaian:</h2>
-        
+
         <div class="results-flex-layout">
           <!-- Left Column: Metrics & Feedback -->
           <div class="results-left-col">
@@ -1936,7 +2201,8 @@
                 <div class="card-info">
                   <h3 class="card-title" id="title-koherensi">Koherensi</h3>
                   <p class="card-feedback" id="feedback-koherensi">Penilaian koherensi akan muncul di sini.</p>
-                  <button class="btn-read-more" id="readmore-koherensi" onclick="openModal('koherensi')">Baca selengkapnya</button>
+                  <button class="btn-read-more" id="readmore-koherensi" onclick="openModal('koherensi')">Baca
+                    selengkapnya</button>
                 </div>
                 <div class="card-gauge">
                   <svg viewBox="0 0 36 36" class="gauge-svg">
@@ -1954,7 +2220,8 @@
                 <div class="card-info">
                   <h3 class="card-title" id="title-kebahasaan">Kebahasaan</h3>
                   <p class="card-feedback" id="feedback-kebahasaan">Penilaian kebahasaan akan muncul di sini.</p>
-                  <button class="btn-read-more" id="readmore-kebahasaan" onclick="openModal('kebahasaan')">Baca selengkapnya</button>
+                  <button class="btn-read-more" id="readmore-kebahasaan" onclick="openModal('kebahasaan')">Baca
+                    selengkapnya</button>
                 </div>
                 <div class="card-gauge">
                   <svg viewBox="0 0 36 36" class="gauge-svg">
@@ -1972,7 +2239,8 @@
                 <div class="card-info">
                   <h3 class="card-title" id="title-kreativitas">Kreativitas</h3>
                   <p class="card-feedback" id="feedback-kreativitas">Penilaian kreativitas akan muncul di sini.</p>
-                  <button class="btn-read-more" id="readmore-kreativitas" onclick="openModal('kreativitas')">Baca selengkapnya</button>
+                  <button class="btn-read-more" id="readmore-kreativitas" onclick="openModal('kreativitas')">Baca
+                    selengkapnya</button>
                 </div>
                 <div class="card-gauge">
                   <svg viewBox="0 0 36 36" class="gauge-svg">
@@ -1989,8 +2257,10 @@
               <div class="result-card">
                 <div class="card-info">
                   <h3 class="card-title" id="title-penggunaan_kata">Penggunaan Kata</h3>
-                  <p class="card-feedback" id="feedback-penggunaan_kata">Penilaian ketepatan kata akan muncul di sini.</p>
-                  <button class="btn-read-more" id="readmore-penggunaan_kata" onclick="openModal('penggunaan_kata')">Baca selengkapnya</button>
+                  <p class="card-feedback" id="feedback-penggunaan_kata">Penilaian ketepatan kata akan muncul di sini.
+                  </p>
+                  <button class="btn-read-more" id="readmore-penggunaan_kata"
+                    onclick="openModal('penggunaan_kata')">Baca selengkapnya</button>
                 </div>
                 <div class="card-gauge">
                   <svg viewBox="0 0 36 36" class="gauge-svg">
@@ -2020,7 +2290,7 @@
               </div>
               <img id="results-share-preview" src="" alt="Share Preview" style="display: none;">
             </div>
-            
+
             <div class="share-actions-stack">
               <button class="btn-share-action" onclick="downloadImageDirectly()" id="btn-download-img">
                 📥 Download Gambar
@@ -2045,10 +2315,6 @@
     </div>
   </div>
 
-
-
-  <!-- Toast Notification -->
-  <div id="toast-notification" class="toast-notification">Caption berhasil disalin! 📋</div>
 
   <!-- Modal Backdrop for Baca Selengkapnya -->
   <div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()">
@@ -2082,6 +2348,20 @@
     let currentLang = localStorage.getItem('lang') || 'id';
     let targetWordCount = parseInt(localStorage.getItem('wordCount')) || 6;
     let darkMode = localStorage.getItem('darkMode') === 'true';
+
+    let timeMode = localStorage.getItem('timeMode') || 'none';
+    let timerDuration = parseInt(localStorage.getItem('timerDuration')) || 120;
+
+    let minParagraphs = parseInt(localStorage.getItem('minParagraphs')) || 1;
+    let minWords = parseInt(localStorage.getItem('minWords')) || 0;
+    let selectedTheme = localStorage.getItem('selectedTheme') || 'bebas';
+
+    let tempTimeMode = timeMode;
+    let tempTimerDuration = timerDuration;
+
+    let timeModeInterval = null;
+    let timeRemaining = 0;
+    let timeElapsed = 0;
 
     // Set initial dark mode on page render
     if (darkMode) {
@@ -2131,7 +2411,24 @@
         btnCopyCaption: "📋 Salin Caption",
         copiedSuccess: "✅ Disalin!",
         shareCaptionText: "Ayo tes kemampuanmu merangkai kata di weavewords.fun!",
-        captionCopied: "Caption berhasil disalin! 📋",
+        settingsLabelTheme: "Tema Game:",
+        settingsLabelTimeMode: "Pengaturan Waktu:",
+        settingsLabelDuration: "Durasi Timer:",
+        settingsLabelMinParagraphs: "Minimal Paragraf (1 paragraf min. 2 kalimat):",
+        settingsLabelMinWords: "Minimal Kata:",
+        settingsLabelWritingTheme: "Tema Tulisan:",
+        optionParagraphs: "Paragraf",
+        themeBebas: "Bebas",
+        themeFilosofis: "Filosofis",
+        themeFiksiIlmiah: "Fiksi Ilmiah (Science Fiction)",
+        themeMisteri: "Misteri / Detektif",
+        themeRomantis: "Romantis (Percintaan)",
+        badgeThemePrefix: "Tema:",
+        badgeMinParagraphsPrefix: "Min. Paragraf:",
+        badgeMinWordsPrefix: "Min. Kata:",
+        btnTimeModeNone: "Tanpa Waktu",
+        btnTimeModeTimer: "Timer",
+        btnTimeModeStopwatch: "Stopwatch",
         loadingWords: "Mengambil kata baru...",
         failedWords: "Gagal mengambil kata. Coba lagi.",
         wordCountSuffix: " kata",
@@ -2192,7 +2489,24 @@
         settingsTitle: "Game Settings",
         settingsLabelWordcount: "Number of words to include:",
         settingsSaveBtn: "Save & Restart",
-        captionCopied: "Caption copied successfully! 📋",
+        settingsLabelTheme: "Game Theme:",
+        settingsLabelTimeMode: "Time Settings:",
+        settingsLabelDuration: "Timer Duration:",
+        settingsLabelMinParagraphs: "Minimum Paragraphs (1 paragraph min. 2 sentences):",
+        settingsLabelMinWords: "Minimum Words:",
+        settingsLabelWritingTheme: "Writing Theme:",
+        optionParagraphs: "Paragraph(s)",
+        themeBebas: "Free Theme",
+        themeFilosofis: "Philosophical",
+        themeFiksiIlmiah: "Science Fiction",
+        themeMisteri: "Mystery / Detective",
+        themeRomantis: "Romance / Drama",
+        badgeThemePrefix: "Theme:",
+        badgeMinParagraphsPrefix: "Min. Paragraphs:",
+        badgeMinWordsPrefix: "Min. Words:",
+        btnTimeModeNone: "Untimed",
+        btnTimeModeTimer: "Timer",
+        btnTimeModeStopwatch: "Stopwatch",
         loadingWords: "Fetching new words...",
         titleKoherensi: "Coherence",
         titleKebahasaan: "Grammar & Language",
@@ -2251,9 +2565,42 @@
       }
     };
 
+    function updateSettingsBadges() {
+      const texts = i18n[currentLang];
+      if (!texts) return;
+
+      const themeLabelMap = {
+        'bebas': texts.themeBebas,
+        'filosofis': texts.themeFilosofis,
+        'fiksi_ilmiah': texts.themeFiksiIlmiah,
+        'misteri': texts.themeMisteri,
+        'romantis': texts.themeRomantis
+      };
+      const themeLabel = themeLabelMap[selectedTheme] || texts.themeBebas;
+      const themeBadge = document.getElementById('badge-theme');
+      if (themeBadge) {
+        themeBadge.textContent = `${texts.badgeThemePrefix || 'Tema:'} ${themeLabel}`;
+      }
+
+      const paraBadge = document.getElementById('badge-min-paragraphs');
+      if (paraBadge) {
+        paraBadge.textContent = `${texts.badgeMinParagraphsPrefix || 'Min. Paragraf:'} ${minParagraphs}`;
+      }
+
+      const wordsBadge = document.getElementById('badge-min-words');
+      if (wordsBadge) {
+        if (minWords > 0) {
+          wordsBadge.textContent = `${texts.badgeMinWordsPrefix || 'Min. Kata:'} ${minWords}`;
+          wordsBadge.style.display = 'inline-block';
+        } else {
+          wordsBadge.style.display = 'none';
+        }
+      }
+    }
+
     function applyTranslations() {
       const texts = i18n[currentLang];
-      
+
       // Update UI elements
       document.getElementById('label-level').textContent = texts.labelLevel;
       document.getElementById('label-words').textContent = texts.labelWords;
@@ -2264,12 +2611,12 @@
       document.getElementById('text-loading').textContent = texts.textLoading;
       document.getElementById('text-results-title').textContent = texts.textResultsTitle;
       document.querySelector('.overall-feedback-container .overall-title').textContent = texts.overallFeedbackLabel;
-      
+
       // Welcome Modal
       document.querySelector('#welcome-backdrop .welcome-description').textContent = texts.welcomeDesc;
       document.querySelector('#welcome-backdrop .welcome-btn-start').textContent = texts.welcomeStartBtn;
       document.querySelector('#welcome-backdrop .welcome-subtext').textContent = texts.welcomeSubtext;
-      
+
       // Sync Welcome lang buttons active class
       const idBtn = document.getElementById('welcome-lang-id');
       const enBtn = document.getElementById('welcome-lang-en');
@@ -2283,37 +2630,37 @@
         }
       }
 
-        // Results Card Titles
-        document.getElementById('title-koherensi').textContent = texts.titleKoherensi;
-        document.getElementById('title-kebahasaan').textContent = texts.titleKebahasaan;
-        document.getElementById('title-kreativitas').textContent = texts.titleKreativitas;
-        document.getElementById('title-penggunaan_kata').textContent = texts.titlePenggunaanKata;
+      // Results Card Titles
+      document.getElementById('title-koherensi').textContent = texts.titleKoherensi;
+      document.getElementById('title-kebahasaan').textContent = texts.titleKebahasaan;
+      document.getElementById('title-kreativitas').textContent = texts.titleKreativitas;
+      document.getElementById('title-penggunaan_kata').textContent = texts.titlePenggunaanKata;
 
-        // Results Card Read More Buttons
-        document.getElementById('readmore-koherensi').textContent = texts.readMore;
-        document.getElementById('readmore-kebahasaan').textContent = texts.readMore;
-        document.getElementById('readmore-kreativitas').textContent = texts.readMore;
-        document.getElementById('readmore-penggunaan_kata').textContent = texts.readMore;
+      // Results Card Read More Buttons
+      document.getElementById('readmore-koherensi').textContent = texts.readMore;
+      document.getElementById('readmore-kebahasaan').textContent = texts.readMore;
+      document.getElementById('readmore-kreativitas').textContent = texts.readMore;
+      document.getElementById('readmore-penggunaan_kata').textContent = texts.readMore;
 
-        // New Results Card Right Column Texts
-        document.getElementById('text-generating-image').textContent = texts.textGeneratingImage;
-        document.getElementById('btn-download-img').textContent = texts.btnDownloadImg;
-        document.getElementById('btn-copy-caption-results').textContent = texts.btnCopyCaption;
-        document.getElementById('btn-play-again-results').textContent = texts.btnPlayAgain;
+      // New Results Card Right Column Texts
+      document.getElementById('text-generating-image').textContent = texts.textGeneratingImage;
+      document.getElementById('btn-download-img').textContent = texts.btnDownloadImg;
+      document.getElementById('btn-copy-caption-results').textContent = texts.btnCopyCaption;
+      document.getElementById('btn-play-again-results').textContent = texts.btnPlayAgain;
 
-        // Detail Modal Labels
-        document.getElementById('modal-label-score').textContent = texts.modalLabelScore;
-        document.getElementById('modal-label-feedback').textContent = texts.modalLabelFeedback;
-        document.getElementById('modal-label-tips').textContent = texts.modalLabelTips;
+      // Detail Modal Labels
+      document.getElementById('modal-label-score').textContent = texts.modalLabelScore;
+      document.getElementById('modal-label-feedback').textContent = texts.modalLabelFeedback;
+      document.getElementById('modal-label-tips').textContent = texts.modalLabelTips;
 
-        // Initial Card Placeholder Descriptions (only if evaluationData is empty)
-        if (!evaluationData || Object.keys(evaluationData).length === 0) {
-          document.getElementById('feedback-koherensi').textContent = texts.feedbackKoherensiInit;
-          document.getElementById('feedback-kebahasaan').textContent = texts.feedbackKebahasaanInit;
-          document.getElementById('feedback-kreativitas').textContent = texts.feedbackKreativitasInit;
-          document.getElementById('feedback-penggunaan_kata').textContent = texts.feedbackPenggunaanKataInit;
-          document.getElementById('overall-feedback-text').textContent = texts.overallFeedbackInit;
-        }
+      // Initial Card Placeholder Descriptions (only if evaluationData is empty)
+      if (!evaluationData || Object.keys(evaluationData).length === 0) {
+        document.getElementById('feedback-koherensi').textContent = texts.feedbackKoherensiInit;
+        document.getElementById('feedback-kebahasaan').textContent = texts.feedbackKebahasaanInit;
+        document.getElementById('feedback-kreativitas').textContent = texts.feedbackKreativitasInit;
+        document.getElementById('feedback-penggunaan_kata').textContent = texts.feedbackPenggunaanKataInit;
+        document.getElementById('overall-feedback-text').textContent = texts.overallFeedbackInit;
+      }
 
       // Tutorial Modal
       document.querySelector('#tutorial-backdrop .tutorial-title').textContent = texts.tutorialTitle;
@@ -2323,8 +2670,36 @@
       // Settings Modal
       document.getElementById('settings-title').textContent = texts.settingsTitle;
       document.getElementById('settings-label-wordcount').textContent = texts.settingsLabelWordcount;
+      document.getElementById('settings-label-theme').textContent = texts.settingsLabelTheme;
+      document.getElementById('settings-label-timemode').textContent = texts.settingsLabelTimeMode;
+      document.getElementById('settings-label-duration').textContent = texts.settingsLabelDuration;
+      document.getElementById('time-mode-btn-none').textContent = texts.btnTimeModeNone;
+      document.getElementById('time-mode-btn-timer').textContent = texts.btnTimeModeTimer;
+      document.getElementById('time-mode-btn-stopwatch').textContent = texts.btnTimeModeStopwatch;
+
+      document.getElementById('settings-label-minparagraphs').textContent = texts.settingsLabelMinParagraphs;
+      document.getElementById('settings-label-minwords').textContent = texts.settingsLabelMinWords;
+      document.getElementById('settings-label-writingtheme').textContent = texts.settingsLabelWritingTheme;
       document.getElementById('settings-save-btn').textContent = texts.settingsSaveBtn;
-      document.getElementById('toast-notification').textContent = texts.captionCopied;
+
+      // Update options in dropdowns
+      const minPSelect = document.getElementById('settings-select-minparagraphs');
+      if (minPSelect) {
+        Array.from(minPSelect.options).forEach(opt => {
+          opt.textContent = `${opt.value} ${texts.optionParagraphs}`;
+        });
+      }
+
+      const themeSelect = document.getElementById('settings-select-writingtheme');
+      if (themeSelect) {
+        themeSelect.options[0].textContent = texts.themeBebas;
+        themeSelect.options[1].textContent = texts.themeFilosofis;
+        themeSelect.options[2].textContent = texts.themeFiksiIlmiah;
+        themeSelect.options[3].textContent = texts.themeMisteri;
+        themeSelect.options[4].textContent = texts.themeRomantis;
+      }
+
+      updateSettingsBadges();
 
       // Translate difficulty level buttons
       const mudahBtn = document.querySelector('.btn-level[data-level="mudah"]');
@@ -2377,6 +2752,21 @@
 
     function openSettingsModal() {
       document.getElementById('word-count-val').textContent = targetWordCount;
+      tempTimeMode = timeMode;
+      tempTimerDuration = timerDuration;
+
+      const minutesVal = Math.floor(tempTimerDuration / 60);
+      const secondsVal = tempTimerDuration % 60;
+      document.getElementById('settings-input-duration-min').value = minutesVal;
+      document.getElementById('settings-input-duration-sec').value = secondsVal;
+
+      document.getElementById('settings-select-minparagraphs').value = minParagraphs;
+      document.getElementById('settings-input-minwords').value = minWords;
+      document.getElementById('settings-select-writingtheme').value = selectedTheme;
+
+      updateThemeButtons();
+      updateTimeModeButtons();
+
       const backdrop = document.getElementById('settings-modal-backdrop');
       if (backdrop) {
         backdrop.style.display = 'flex';
@@ -2403,6 +2793,43 @@
       }
     }
 
+    function setThemeModeSetting(isDark) {
+      if (darkMode !== isDark) {
+        toggleDarkMode();
+      }
+      updateThemeButtons();
+    }
+
+    function setTimeModeSetting(mode) {
+      tempTimeMode = mode;
+      updateTimeModeButtons();
+    }
+
+    function updateThemeButtons() {
+      const lightBtn = document.getElementById('theme-btn-light');
+      const darkBtn = document.getElementById('theme-btn-dark');
+      if (lightBtn && darkBtn) {
+        if (darkMode) {
+          darkBtn.classList.add('active');
+          lightBtn.classList.remove('active');
+        } else {
+          lightBtn.classList.add('active');
+          darkBtn.classList.remove('active');
+        }
+      }
+    }
+
+    function updateTimeModeButtons() {
+      document.querySelectorAll('.time-mode-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`time-mode-btn-${tempTimeMode}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const durationRow = document.getElementById('timer-duration-row');
+      if (durationRow) {
+        durationRow.style.display = tempTimeMode === 'timer' ? 'flex' : 'none';
+      }
+    }
+
     // Close dropdown on click outside
     window.addEventListener('click', () => {
       const dropdown = document.getElementById('lang-dropdown');
@@ -2413,15 +2840,77 @@
       const val = parseInt(document.getElementById('word-count-val').textContent);
       targetWordCount = val;
       localStorage.setItem('wordCount', targetWordCount);
+
+      // Save Time Mode
+      localStorage.setItem('timeMode', tempTimeMode);
+      timeMode = tempTimeMode;
+
+      // Save Custom Timer Duration
+      const mins = parseInt(document.getElementById('settings-input-duration-min').value) || 0;
+      const secs = parseInt(document.getElementById('settings-input-duration-sec').value) || 0;
+      let totalSecs = (mins * 60) + secs;
+      if (totalSecs < 1) totalSecs = 1; // Clamp to min 1 second
+      tempTimerDuration = totalSecs;
+      localStorage.setItem('timerDuration', tempTimerDuration);
+      timerDuration = tempTimerDuration;
+
+      // Save Min Paragraphs
+      minParagraphs = parseInt(document.getElementById('settings-select-minparagraphs').value) || 1;
+      localStorage.setItem('minParagraphs', minParagraphs);
+
+      // Save Min Words
+      minWords = parseInt(document.getElementById('settings-input-minwords').value) || 0;
+      localStorage.setItem('minWords', minWords);
+
+      // Save Writing Theme
+      selectedTheme = document.getElementById('settings-select-writingtheme').value || 'bebas';
+      localStorage.setItem('selectedTheme', selectedTheme);
+
+      updateSettingsBadges();
+      checkWordUsage();
+
       closeSettingsModal();
       fetchNewWords();
     }
 
     // Initialize game on load
     window.addEventListener('DOMContentLoaded', () => {
+      // Reset all game settings to default on reload
+      targetWordCount = 6;
+      timeMode = 'none';
+      timerDuration = 120;
+      minParagraphs = 1;
+      minWords = 0;
+      selectedTheme = 'bebas';
+
+      localStorage.setItem('wordCount', targetWordCount);
+      localStorage.setItem('timeMode', timeMode);
+      localStorage.setItem('timerDuration', timerDuration);
+      localStorage.setItem('minParagraphs', minParagraphs);
+      localStorage.setItem('minWords', minWords);
+      localStorage.setItem('selectedTheme', selectedTheme);
+
       updateLogo();
       applyTranslations();
       selectLevel('mudah');
+
+      // Paste blocker
+      const essayInput = document.getElementById('essay-input');
+      if (essayInput) {
+        essayInput.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const errorEl = document.getElementById('error-popup');
+          if (errorEl) {
+            errorEl.textContent = currentLang === 'id' ?
+              '⚠️ Fitur tempel (paste) dinonaktifkan untuk mencegah kecurangan!' :
+              '⚠️ Pasting is disabled to prevent cheating!';
+            errorEl.classList.add('show');
+            setTimeout(() => {
+              errorEl.classList.remove('show');
+            }, 3000);
+          }
+        });
+      }
     });
 
     // Select level toggles
@@ -2461,6 +2950,7 @@
           activeWords = data.kata;
           renderWords();
           checkWordUsage();
+          initTimeMode();
         })
         .catch(err => {
           console.error('Error fetching words:', err);
@@ -2472,15 +2962,295 @@
     function renderWords() {
       const wordsListEl = document.getElementById('words-list');
       wordsListEl.innerHTML = activeWords.map(word => `
-    <div class="word-chip" id="chip-${word}">
+    <div class="word-chip" id="chip-${word}" onclick="insertWord('${word}')">
       <span class="check-icon">✓</span>
       <span class="word-text">${word}</span>
     </div>
   `).join('');
     }
 
+    // Insert clicked word into essay input textarea at cursor position
+    function insertWord(word) {
+      const essayInput = document.getElementById('essay-input');
+      if (!essayInput) return;
+
+      const start = essayInput.selectionStart;
+      const end = essayInput.selectionEnd;
+      const text = essayInput.value;
+
+      const before = text.substring(0, start);
+      const after = text.substring(end);
+
+      let wordToInsert = word;
+
+      // If there's text before cursor and it doesn't end with whitespace, prepend space
+      if (start > 0 && !/\s$/.test(before)) {
+        wordToInsert = ' ' + wordToInsert;
+      }
+
+      // If there's text after cursor and it doesn't start with whitespace, append space
+      // If cursor is at the end, append a space as well to prepare for next typing
+      if (after.length > 0 && !/^\s/.test(after)) {
+        wordToInsert = wordToInsert + ' ';
+      } else if (after.length === 0) {
+        wordToInsert = wordToInsert + ' ';
+      }
+
+      essayInput.value = before + wordToInsert + after;
+
+      // Focus textarea and move cursor
+      essayInput.focus();
+      const newCursorPos = start + wordToInsert.length;
+      essayInput.setSelectionRange(newCursorPos, newCursorPos);
+
+      onEssayInput();
+    }
+
+    let timerStarted = false;
+
+    function initTimeMode() {
+      // Clear any existing intervals
+      if (timeModeInterval) {
+        clearInterval(timeModeInterval);
+        timeModeInterval = null;
+      }
+      timerStarted = false;
+
+      const displayEl = document.getElementById('time-display');
+      if (!displayEl) return;
+
+      displayEl.classList.remove('warning');
+
+      if (timeMode === 'none') {
+        displayEl.style.display = 'none';
+        return;
+      }
+
+      displayEl.style.display = 'inline-flex';
+
+      if (timeMode === 'timer') {
+        timeRemaining = timerDuration;
+        updateTimeDisplay(timeRemaining);
+      } else if (timeMode === 'stopwatch') {
+        timeElapsed = 0;
+        updateTimeDisplay(timeElapsed);
+      }
+    }
+
+    function startActiveTimer() {
+      if (timerStarted) return;
+      if (timeMode === 'none') return;
+      timerStarted = true;
+
+      const displayEl = document.getElementById('time-display');
+      if (!displayEl) return;
+
+      if (timeMode === 'timer') {
+        timeModeInterval = setInterval(() => {
+          timeRemaining--;
+          updateTimeDisplay(timeRemaining);
+
+          if (timeRemaining <= 15) {
+            displayEl.classList.add('warning');
+          }
+
+          if (timeRemaining <= 5 && timeRemaining > 0) {
+            playWarningTickAudio(timeRemaining);
+          }
+
+          if (timeRemaining <= 0) {
+            clearInterval(timeModeInterval);
+            timeModeInterval = null;
+            onTimerEnd();
+          }
+        }, 1000);
+      } else if (timeMode === 'stopwatch') {
+        timeModeInterval = setInterval(() => {
+          timeElapsed++;
+          updateTimeDisplay(timeElapsed);
+        }, 1000);
+      }
+    }
+
+    function updateTimeDisplay(seconds) {
+      const displayEl = document.getElementById('time-display');
+      if (!displayEl) return;
+
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+      // Let's add an SVG icon
+      let icon = '';
+      if (timeMode === 'timer') {
+        icon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 2px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+      } else if (timeMode === 'stopwatch') {
+        icon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 2px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 12"></polyline><path d="M12 2v2"></path></svg>`;
+      }
+
+      displayEl.innerHTML = `${icon}<span>${formatted}</span>`;
+    }
+
+    function onTimerEnd() {
+      if (timeModeInterval) {
+        clearInterval(timeModeInterval);
+        timeModeInterval = null;
+      }
+
+      playTimerEndAudio();
+      submitEssay(true);
+    }
+
+    function playTimerEndAudio() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const playBeep = (freq, duration, startTime) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, startTime);
+
+          gain.gain.setValueAtTime(0.1, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(startTime);
+          osc.stop(startTime + duration);
+        };
+
+        const now = audioCtx.currentTime;
+        // Beep sequence: 3 short beeps, then 1 long beep
+        playBeep(880, 0.15, now);
+        playBeep(880, 0.15, now + 0.2);
+        playBeep(880, 0.15, now + 0.4);
+        playBeep(440, 0.6, now + 0.6);
+      } catch (err) {
+        console.error("Audio Context error:", err);
+      }
+    }
+
+    function playWarningTickAudio(sec) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        // Make the last tick slightly higher pitch for urgency
+        const freq = sec === 1 ? 1200 : 1000;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+      } catch (err) {
+        console.error("Warning tick audio error:", err);
+      }
+    }
+
+    function playConfettiAudio() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+
+        // 1. Synthesize a clean "pop" sound using a short pitch-swept oscillator
+        const popOsc = audioCtx.createOscillator();
+        const popGain = audioCtx.createGain();
+        popOsc.type = 'triangle';
+        popOsc.frequency.setValueAtTime(150, now);
+        popOsc.frequency.exponentialRampToValueAtTime(10, now + 0.1);
+        popGain.gain.setValueAtTime(0.3, now);
+        popGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        popOsc.connect(popGain);
+        popGain.connect(audioCtx.destination);
+        popOsc.start(now);
+        popOsc.stop(now + 0.1);
+
+        // 2. Synthesize a celebratory retro "win arpeggio" (chime chord)
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, index) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          const noteStart = now + 0.08 + (index * 0.08);
+          const noteDuration = 0.25;
+
+          // Blend of sine and triangle waves for a rich chime sound
+          osc.type = index % 2 === 0 ? 'sine' : 'triangle';
+          osc.frequency.setValueAtTime(freq, noteStart);
+
+          // Add a subtle vibrato/pitch modulation
+          const vibrato = audioCtx.createOscillator();
+          const vibratoGain = audioCtx.createGain();
+          vibrato.frequency.value = 8;
+          vibratoGain.gain.value = 4;
+          vibrato.connect(vibratoGain);
+          vibratoGain.connect(osc.frequency);
+          vibrato.start(noteStart);
+          vibrato.stop(noteStart + noteDuration);
+
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.setValueAtTime(0.12, noteStart);
+          gain.gain.exponentialRampToValueAtTime(0.001, noteStart + noteDuration);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(noteStart);
+          osc.stop(noteStart + noteDuration);
+        });
+      } catch (err) {
+        console.error("Confetti audio error:", err);
+      }
+    }
+
+    function playWordUsedAudio() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.06);
+
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.06);
+      } catch (err) {
+        console.error("Word used audio error:", err);
+      }
+    }
+
     // Auto-grow textarea height and check word usage on input
     function onEssayInput() {
+      startActiveTimer();
       checkWordUsage();
       const essayInput = document.getElementById('essay-input');
       essayInput.style.height = '140px';
@@ -2511,6 +3281,10 @@
           const lowerWord = word.toLowerCase();
           const isUsed = cleanWords.some(w => w.includes(lowerWord));
           if (isUsed) {
+            // Play a satisfying pop sound if the word just transitioned to "used"
+            if (!chipEl.classList.contains('used')) {
+              playWordUsedAudio();
+            }
             chipEl.classList.add('used');
             usedWordsCount++;
           } else {
@@ -2519,9 +3293,20 @@
         }
       });
 
+      // Check paragraphs and sentences
+      const paragraphs = text.split(/\n+/).map(p => p.trim()).filter(p => p.length > 0);
+      const validParagraphs = paragraphs.filter(p => {
+        const sentences = p.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
+        return sentences.length >= 2;
+      });
+
+      const meetsParagraphRequirement = validParagraphs.length >= minParagraphs;
+      const meetsWordRequirement = wordsArray.length >= minWords;
+      const meetsWordUsageRequirement = usedWordsCount === activeWords.length;
+
       // Visual state for button: faded if requirements not met
       const submitBtn = document.getElementById('btn-submit');
-      if (usedWordsCount < activeWords.length || text.trim() === '') {
+      if (!meetsWordUsageRequirement || text.trim() === '' || !meetsParagraphRequirement || !meetsWordRequirement) {
         submitBtn.classList.add('incomplete');
       } else {
         submitBtn.classList.remove('incomplete');
@@ -2529,15 +3314,22 @@
     }
 
     // Send writing to Flask backend for AI grading
-    function submitEssay() {
+    function submitEssay(isAutoSubmit = false) {
+      if (isAutoSubmit && (document.getElementById('loading-container').style.display === 'flex' ||
+        document.getElementById('results-section').style.display === 'flex')) {
+        return;
+      }
+
       const errorEl = document.getElementById('error-popup');
       const essay = document.getElementById('essay-input').value.trim();
       const texts = i18n[currentLang];
-      
+
       if (!essay) {
-        errorEl.textContent = texts.emptyEssayErr;
-        errorEl.classList.add('show');
-        return;
+        if (!isAutoSubmit) {
+          errorEl.textContent = texts.emptyEssayErr;
+          errorEl.classList.add('show');
+          return;
+        }
       }
 
       // Check if all words are used
@@ -2552,13 +3344,43 @@
         }
       });
 
-      if (usedWordsCount < activeWords.length) {
+      if (!isAutoSubmit && usedWordsCount < activeWords.length) {
         errorEl.textContent = texts.incompleteWordsErr;
         errorEl.classList.add('show');
         return;
       }
 
+      // Check paragraph requirement
+      const paragraphs = essay.split(/\n+/).map(p => p.trim()).filter(p => p.length > 0);
+      const validParagraphs = paragraphs.filter(p => {
+        const sentences = p.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 0);
+        return sentences.length >= 2;
+      });
+
+      if (!isAutoSubmit && validParagraphs.length < minParagraphs) {
+        errorEl.textContent = currentLang === 'id' ?
+          `⚠️ Minimal ${minParagraphs} paragraf (tiap paragraf minimal 2 kalimat)!` :
+          `⚠️ Minimum ${minParagraphs} paragraph(s) required (each paragraph must have at least 2 sentences)!`;
+        errorEl.classList.add('show');
+        return;
+      }
+
+      // Check word requirement
+      if (!isAutoSubmit && cleanWords.length < minWords) {
+        errorEl.textContent = currentLang === 'id' ?
+          `⚠️ Minimal ${minWords} kata diperlukan! (Saat ini: ${cleanWords.length} kata)` :
+          `⚠️ Minimum ${minWords} words required! (Current: ${cleanWords.length} words)`;
+        errorEl.classList.add('show');
+        return;
+      }
+
       errorEl.classList.remove('show');
+
+      // Clear timer interval
+      if (timeModeInterval) {
+        clearInterval(timeModeInterval);
+        timeModeInterval = null;
+      }
 
       // UI state updates: show loading, hide results
       document.getElementById('loading-container').style.display = 'flex';
@@ -2575,7 +3397,12 @@
       fetch('/nilai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ esai: essay, kata: activeWords, lang: currentLang })
+        body: JSON.stringify({
+          esai: essay,
+          kata: activeWords,
+          lang: currentLang,
+          tema: selectedTheme
+        })
       })
         .then(res => res.json())
         .then(data => {
@@ -2600,6 +3427,9 @@
       const resultsSection = document.getElementById('results-section');
       resultsSection.style.display = 'flex';
       document.body.style.overflow = 'hidden';
+
+      // Play confetti pop & chime audio
+      playConfettiAudio();
 
       // Fire confetti burst!
       confetti({
@@ -2779,10 +3609,6 @@
       try {
         await navigator.clipboard.writeText(caption);
 
-        // Show toast
-        const toast = document.getElementById("toast-notification");
-        toast.className = "toast-notification show";
-
         // Change button text temporarily
         const originalBtnText = btn.innerHTML;
         btn.innerHTML = texts.copiedSuccess;
@@ -2791,7 +3617,6 @@
         btn.style.borderColor = "#065f46";
 
         setTimeout(function () {
-          toast.className = toast.className.replace("show", "");
           btn.innerHTML = originalBtnText;
           btn.style.backgroundColor = "";
           btn.style.color = "";
