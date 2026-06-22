@@ -869,10 +869,81 @@
       top: -9999px;
       width: 1000px;
       height: 1000px;
-      background-image: url('/static/share.png');
+      background-image: url('/static/popup-bg.png');
       background-size: cover;
       background-position: center;
       font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .share-card-title {
+      position: absolute;
+      left: 185px;
+      top: 172px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #0b2154;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .share-quote {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+    }
+
+    .share-quote.opening {
+      left: 185px;
+      top: 205px;
+    }
+
+    .share-quote.closing {
+      right: 185px;
+      bottom: 280px;
+      transform: rotate(180deg);
+    }
+
+    .share-logo {
+      position: absolute;
+      left: 153px;
+      bottom: 145px;
+      width: 275px;
+      height: 74px;
+      object-fit: contain;
+    }
+
+    .share-chips-container {
+      position: absolute;
+      right: 153px;
+      bottom: 158px; /* vertically centers with logo which is bottom: 145px, height: 74px */
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .share-chip {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      padding: 8px 24px;
+      border-radius: 9999px;
+      background-color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      height: 48px;
+      box-sizing: border-box;
+    }
+
+    .share-chip.chip-time {
+      border: 2px solid #e6d59b;
+      color: #a68d37;
+    }
+
+    .share-chip.chip-theme {
+      border: 2px solid #45c496;
+      color: #37ab81;
     }
 
     .share-text-box {
@@ -2062,11 +2133,12 @@
         <div class="settings-row">
           <label class="settings-label" id="settings-label-writingtheme">Tema Tulisan:</label>
           <select id="settings-select-writingtheme" class="settings-select">
-            <option value="bebas">Bebas</option>
             <option value="filosofis">Filosofis</option>
-            <option value="fiksi_ilmiah">Fiksi Ilmiah</option>
-            <option value="misteri">Misteri</option>
+            <option value="komedi">Komedi</option>
+            <option value="puitis">Puitis</option>
             <option value="romantis">Romantis</option>
+            <option value="fantasi">Fantasi</option>
+            <option value="bebas">Bebas</option>
           </select>
         </div>
         <button class="btn-settings-save" onclick="saveSettings()" id="settings-save-btn">Simpan & Mulai Baru</button>
@@ -2310,8 +2382,49 @@
 
   <!-- Share Card Container (Hidden) -->
   <div class="share-card-container" id="share-card">
+    <!-- Title "Paragraph of the day is..." -->
+    <div class="share-card-title" id="share-card-title-text">Paragraph of the day is...</div>
+    
+    <!-- Opening Quote SVG -->
+    <svg class="share-quote opening" viewBox="0 0 16 16" fill="#9db1f6">
+      <rect x="2" y="1" width="3" height="3" />
+      <rect x="1" y="4" width="3" height="3" />
+      <rect x="0" y="7" width="3" height="4" />
+      <rect x="1" y="11" width="2" height="2" />
+      
+      <rect x="8" y="1" width="3" height="3" />
+      <rect x="7" y="4" width="3" height="3" />
+      <rect x="6" y="7" width="3" height="4" />
+      <rect x="7" y="11" width="2" height="2" />
+    </svg>
+
+    <!-- Essay Text Box -->
     <div class="share-text-box">
       <div class="share-text-content" id="share-essay-text"></div>
+    </div>
+
+    <!-- Closing Quote SVG -->
+    <svg class="share-quote closing" viewBox="0 0 16 16" fill="#9db1f6">
+      <rect x="2" y="1" width="3" height="3" />
+      <rect x="1" y="4" width="3" height="3" />
+      <rect x="0" y="7" width="3" height="4" />
+      <rect x="1" y="11" width="2" height="2" />
+      
+      <rect x="8" y="1" width="3" height="3" />
+      <rect x="7" y="4" width="3" height="3" />
+      <rect x="6" y="7" width="3" height="4" />
+      <rect x="7" y="11" width="2" height="2" />
+    </svg>
+
+    <!-- Bottom Left Logo -->
+    <img src="/static/logo.png" class="share-logo" alt="Weave Words Logo">
+
+    <!-- Bottom Right Chips -->
+    <div class="share-chips-container" id="share-chips">
+      <!-- Time spent chip -->
+      <div class="share-chip chip-time" id="share-chip-time" style="display: none;">00:00</div>
+      <!-- Theme chip -->
+      <div class="share-chip chip-theme" id="share-chip-theme" style="display: none;">Bebas</div>
     </div>
   </div>
 
@@ -2420,9 +2533,10 @@
         optionParagraphs: "Paragraf",
         themeBebas: "Bebas",
         themeFilosofis: "Filosofis",
-        themeFiksiIlmiah: "Fiksi Ilmiah (Science Fiction)",
-        themeMisteri: "Misteri / Detektif",
-        themeRomantis: "Romantis (Percintaan)",
+        themeKomedi: "Komedi",
+        themePuitis: "Puitis",
+        themeRomantis: "Romantis",
+        themeFantasi: "Fantasi",
         badgeThemePrefix: "Tema:",
         badgeMinParagraphsPrefix: "Min. Paragraf:",
         badgeMinWordsPrefix: "Min. Kata:",
@@ -2498,9 +2612,10 @@
         optionParagraphs: "Paragraph(s)",
         themeBebas: "Free Theme",
         themeFilosofis: "Philosophical",
-        themeFiksiIlmiah: "Science Fiction",
-        themeMisteri: "Mystery / Detective",
-        themeRomantis: "Romance / Drama",
+        themeKomedi: "Comedy",
+        themePuitis: "Poetic",
+        themeRomantis: "Romance",
+        themeFantasi: "Fantasy",
         badgeThemePrefix: "Theme:",
         badgeMinParagraphsPrefix: "Min. Paragraphs:",
         badgeMinWordsPrefix: "Min. Words:",
@@ -2572,9 +2687,10 @@
       const themeLabelMap = {
         'bebas': texts.themeBebas,
         'filosofis': texts.themeFilosofis,
-        'fiksi_ilmiah': texts.themeFiksiIlmiah,
-        'misteri': texts.themeMisteri,
-        'romantis': texts.themeRomantis
+        'komedi': texts.themeKomedi,
+        'puitis': texts.themePuitis,
+        'romantis': texts.themeRomantis,
+        'fantasi': texts.themeFantasi
       };
       const themeLabel = themeLabelMap[selectedTheme] || texts.themeBebas;
       const themeBadge = document.getElementById('badge-theme');
@@ -2692,11 +2808,12 @@
 
       const themeSelect = document.getElementById('settings-select-writingtheme');
       if (themeSelect) {
-        themeSelect.options[0].textContent = texts.themeBebas;
-        themeSelect.options[1].textContent = texts.themeFilosofis;
-        themeSelect.options[2].textContent = texts.themeFiksiIlmiah;
-        themeSelect.options[3].textContent = texts.themeMisteri;
-        themeSelect.options[4].textContent = texts.themeRomantis;
+        themeSelect.options[0].textContent = texts.themeFilosofis;
+        themeSelect.options[1].textContent = texts.themeKomedi;
+        themeSelect.options[2].textContent = texts.themePuitis;
+        themeSelect.options[3].textContent = texts.themeRomantis;
+        themeSelect.options[4].textContent = texts.themeFantasi;
+        themeSelect.options[5].textContent = texts.themeBebas;
       }
 
       updateSettingsBadges();
@@ -3235,14 +3352,14 @@
         osc.frequency.setValueAtTime(600, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.06);
 
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
 
         osc.connect(gain);
         gain.connect(audioCtx.destination);
 
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.06);
+        osc.stop(audioCtx.currentTime + 0.12);
       } catch (err) {
         console.error("Word used audio error:", err);
       }
@@ -3472,6 +3589,54 @@
       if (essayText.length > 350) textBox.style.fontSize = '24px';
       if (essayText.length > 500) textBox.style.fontSize = '20px';
 
+      const texts = i18n[currentLang] || i18n['id'];
+
+      // Set dynamic values in the share card
+      // 1. Time chip (Timer/Stopwatch)
+      const chipTime = document.getElementById('share-chip-time');
+      if (chipTime) {
+        if (timeMode === 'timer' || timeMode === 'stopwatch') {
+          let spent = 0;
+          if (timeMode === 'timer') {
+            spent = timerDuration - timeRemaining;
+          } else if (timeMode === 'stopwatch') {
+            spent = timeElapsed;
+          }
+          if (spent < 0) spent = 0;
+          const mins = Math.floor(spent / 60);
+          const secs = spent % 60;
+          chipTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+          chipTime.style.display = 'inline-flex';
+        } else {
+          chipTime.style.display = 'none';
+        }
+      }
+
+      // 2. Theme chip
+      const chipTheme = document.getElementById('share-chip-theme');
+      if (chipTheme) {
+        if (selectedTheme && selectedTheme !== 'bebas') {
+          const themeLabelMap = {
+            'bebas': texts.themeBebas,
+            'filosofis': texts.themeFilosofis,
+            'komedi': texts.themeKomedi,
+            'puitis': texts.themePuitis,
+            'romantis': texts.themeRomantis,
+            'fantasi': texts.themeFantasi
+          };
+          let label = themeLabelMap[selectedTheme] || selectedTheme;
+          if (label.indexOf('(') !== -1) {
+            label = label.split('(')[0].trim();
+          }
+          // Capitalize first letter of each word
+          label = label.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+          chipTheme.textContent = label;
+          chipTheme.style.display = 'inline-flex';
+        } else {
+          chipTheme.style.display = 'none';
+        }
+      }
+
       const shareCard = document.getElementById('share-card');
 
       html2canvas(shareCard, {
@@ -3668,6 +3833,35 @@
         }, 400); // Sinkron dengan transition CSS opacity
       }
     }
+
+    // Global button pop sound — plays on every button and .lang-option click
+    function playButtonPopAudio() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.06);
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      } catch (err) {
+        console.error("Button pop audio error:", err);
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('button, .lang-option, .word-chip');
+      // word-chip sudah punya playWordUsedAudio(), skip supaya tidak double pop
+      if (target && !target.classList.contains('word-chip')) {
+        playButtonPopAudio();
+      }
+    });
   </script>
 
 </body>
