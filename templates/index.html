@@ -18,21 +18,24 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
     import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // ======================================================
     // KONFIGURASI FIREBASE — Ganti dengan config project Anda
     // ======================================================
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyB2YsnIllcVYLAImC5MxW4QOypsrYTlOVI",
+      authDomain: "weavewords-ac99f.firebaseapp.com",
+      projectId: "weavewords-ac99f",
+      storageBucket: "weavewords-ac99f.firebasestorage.app",
+      messagingSenderId: "800108574919",
+      appId: "1:800108574919:web:73932ff8864922fe8066e2",
+      measurementId: "G-HJ9C7MW22Y"
     };
 
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
     // Expose ke global agar bisa dipanggil dari non-module script
@@ -54,6 +57,24 @@
   </script>
 
   <style>
+    @font-face {
+      font-family: 'Cavalhatriz';
+      src: url('/static/Cavalhatriz.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    .about-eyebrow,
+    .section-heading .eyebrow {
+      font-family: 'Cavalhatriz', sans-serif !important;
+      font-size: 36px !important;
+    }
+
+    .about-title,
+    .section-heading h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+
     :root {
       --primary: #4658cc;
       --primary-hover: #3746ab;
@@ -90,6 +111,10 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     html,
     body {
       overflow-x: hidden;
@@ -100,10 +125,6 @@
       background-color: var(--bg-body);
       color: var(--text-main);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
       line-height: 1.5;
     }
 
@@ -227,6 +248,29 @@
       color: #ffffff;
     }
 
+    @media (max-width: 480px) {
+      .level-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .level-buttons {
+        width: 100%;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 6px;
+      }
+
+      .btn-level {
+        flex: 1;
+        padding: 6px 10px;
+        font-size: 12.5px;
+        text-align: center;
+        white-space: nowrap;
+      }
+    }
+
     /* Words Section */
     .words-section {
       margin-bottom: 28px;
@@ -307,6 +351,93 @@
 
     .word-chip.used .check-icon {
       display: inline;
+    }
+
+    /* Instagram Name Tag Style Tooltip */
+    .word-chip-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .word-tooltip-container {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 2.5px;
+      /* for gradient border */
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
+      width: 220px;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
+
+    /* Instagram signature gradient border */
+    .word-tooltip-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 12px;
+      padding: 2.5px;
+      background: #38bdf8;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .word-tooltip-inner {
+      background: var(--bg-card);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: center;
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 600;
+      color: var(--text-main);
+      box-sizing: border-box;
+    }
+
+    .word-tooltip-arrow {
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: var(--bg-card);
+      border-right: 2px solid #38bdf8;
+      border-bottom: 2px solid #38bdf8;
+      z-index: 99;
+    }
+
+    body.dark-mode .word-tooltip-inner {
+      background: #1e293b;
+      color: #f1f5f9;
+    }
+
+    body.dark-mode .word-tooltip-container {
+      background: #1e293b;
+    }
+
+    body.dark-mode .word-tooltip-arrow {
+      background: #1e293b;
+    }
+
+    .word-chip-wrapper:hover .word-tooltip-container {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
     }
 
     /* Writing Section */
@@ -426,9 +557,9 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background-color: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -437,26 +568,16 @@
       gap: 20px;
     }
 
-    #loading-container .spinner {
-      width: 64px;
-      height: 64px;
-      border: 5px solid var(--border-color);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
     #loading-container p {
       font-size: 18px;
       font-weight: 700;
-      color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      color: #0f172a;
     }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+    .loading-gif {
+      width: 180px;
+      height: auto;
+      object-fit: contain;
     }
 
     /* Results Dashboard Overlay */
@@ -952,7 +1073,8 @@
     .share-chips-container {
       position: absolute;
       right: 153px;
-      bottom: 158px; /* vertically centers with logo which is bottom: 145px, height: 74px */
+      bottom: 158px;
+      /* vertically centers with logo which is bottom: 145px, height: 74px */
       display: flex;
       gap: 16px;
       align-items: center;
@@ -1487,12 +1609,103 @@
         transform: scale(1);
       }
 
-      50% {
-        transform: scale(1.06);
-      }
-
       100% {
         transform: scale(1);
+      }
+    }
+
+    /* Custom Chip Input Styles */
+    .custom-words-container {
+      margin-bottom: 24px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      background: var(--bg-body);
+      transition: var(--transition);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .chip-input-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 8px 12px;
+      min-height: 48px;
+      box-sizing: border-box;
+      cursor: text;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+    }
+
+    .chip-input-wrapper:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(70, 88, 204, 0.1);
+    }
+
+    body.dark-mode .chip-input-wrapper:focus-within {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    .chip-input-wrapper input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text-main);
+      min-width: 120px;
+      padding: 4px 0;
+    }
+
+    .custom-chip {
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+      cursor: default;
+      transition: var(--transition);
+      animation: scaleUp 0.15s ease-out;
+    }
+
+    body.dark-mode .custom-chip {
+      background: #38bdf8;
+      color: #0b0f19;
+    }
+
+    .custom-chip .remove-btn {
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .custom-chip .remove-btn:hover {
+      opacity: 1;
+    }
+
+    @keyframes scaleUp {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
       }
     }
 
@@ -1643,6 +1856,65 @@
       width: 170px;
       overflow: hidden;
       animation: dropdownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Words Menu Dropdown */
+    .words-dropdown {
+      position: absolute;
+      top: 46px;
+      right: 0;
+      background-color: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      z-index: 5000;
+      width: 180px;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+      padding: 4px 0;
+      animation: dropdownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .words-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 10px 16px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: left;
+      transition: var(--transition);
+      box-sizing: border-box;
+    }
+
+    .words-dropdown-item:hover {
+      background-color: rgba(70, 88, 204, 0.08);
+      color: var(--primary);
+    }
+
+    .words-dropdown-item .icon {
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+    }
+
+    body.dark-mode .words-dropdown {
+      background-color: #0b0f19;
+      border-color: #334155;
+    }
+
+    body.dark-mode .words-dropdown-item:hover {
+      background-color: rgba(56, 189, 248, 0.1);
+      color: #38bdf8;
     }
 
     .lang-dropdown.show {
@@ -1941,26 +2213,51 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 56px;
+      height: 72px;
       transition: box-shadow 0.3s ease;
     }
+
     body.dark-mode .site-nav {
       background: rgba(11, 15, 25, 0.92);
       border-bottom-color: #1e293b;
     }
+
     .site-nav.scrolled {
-      box-shadow: 0 2px 16px rgba(70,88,204,0.08);
+      box-shadow: 0 2px 16px rgba(70, 88, 204, 0.08);
     }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     .nav-logo {
-      height: 32px;
+      height: 44px;
       object-fit: contain;
       pointer-events: none;
       user-select: none;
     }
+
     .nav-links {
       display: flex;
       gap: 4px;
     }
+
+    /* Full-width Game sections */
+    .level-section,
+    .words-section,
+    .writing-section {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
     .nav-links a {
       font-size: 13px;
       font-weight: 600;
@@ -1970,14 +2267,150 @@
       border-radius: 8px;
       transition: var(--transition);
     }
+
     .nav-links a:hover,
     .nav-links a.active {
       color: var(--primary);
-      background: rgba(70,88,204,0.08);
+      background: rgba(70, 88, 204, 0.08);
     }
-    @media (max-width: 600px) {
-      .nav-links { gap: 0; }
-      .nav-links a { padding: 6px 7px; font-size: 12px; }
+
+    .nav-toggle {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+
+      .about-eyebrow,
+      .section-heading .eyebrow {
+        font-size: 24px !important;
+      }
+
+      .nav-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 24px;
+        height: 18px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 9500;
+      }
+
+      .nav-toggle .bar {
+        width: 100%;
+        height: 2.5px;
+        background-color: var(--text-main);
+        border-radius: 2px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .nav-toggle.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+      }
+
+      .nav-toggle.active .bar:nth-child(2) {
+        opacity: 0;
+      }
+
+      .nav-toggle.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+      }
+
+      .nav-links {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 72px;
+        right: -100%;
+        width: 220px;
+        background-color: var(--bg-card);
+        border-left: 1.5px solid var(--border-color);
+        border-bottom: 1.5px solid var(--border-color);
+        padding: 16px;
+        box-sizing: border-box;
+        gap: 8px;
+        box-shadow: var(--shadow-lg);
+        border-radius: 0 0 0 16px;
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 9000;
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links a {
+        width: 100%;
+        padding: 10px 16px;
+        box-sizing: border-box;
+      }
+
+      /* Settings modal mobile view fix */
+      .settings-modal-card {
+        padding: 20px 16px !important;
+        border-radius: 16px !important;
+        max-width: 360px !important;
+      }
+
+      .settings-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+        margin-bottom: 14px !important;
+      }
+
+      .settings-label {
+        max-width: 100% !important;
+        font-size: 13.5px !important;
+        margin-bottom: 2px !important;
+      }
+
+      .word-count-controls,
+      .theme-controls,
+      .time-mode-controls,
+      .settings-select,
+      .settings-input-num,
+      #settings-input-minwords,
+      .time-duration-input-wrapper {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        flex-shrink: 1 !important;
+        box-sizing: border-box !important;
+      }
+
+      .time-duration-input-wrapper input {
+        flex: 1 !important;
+        width: auto !important;
+      }
+
+      .nav-controls {
+        gap: 6px !important;
+      }
+
+      .nav-controls .control-btn {
+        width: 34px !important;
+        height: 34px !important;
+      }
+
+      .nav-controls .control-btn svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+
+      .nav-controls .lang-btn {
+        padding: 0 !important;
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 50% !important;
+        justify-content: center !important;
+      }
+
+      #current-lang-text {
+        display: none !important;
+      }
     }
 
     /* ==========================================
@@ -1985,18 +2418,19 @@
        ========================================== */
     .landing-page {
       width: 100%;
-      padding-top: 56px; /* height of navbar */
+      padding-top: 72px;
+      /* height of navbar */
     }
 
     /* ==========================================
        HERO / GAME SECTION
        ========================================== */
     #section-game {
-      min-height: 100vh;
+      min-height: calc(100vh - 56px);
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding: 60px 20px 80px;
+      padding: 24px 20px 48px;
     }
 
     /* ==========================================
@@ -2009,6 +2443,7 @@
       position: relative;
       overflow: hidden;
     }
+
     #section-about::before {
       content: '';
       position: absolute;
@@ -2017,23 +2452,25 @@
       transform: translateX(-50%);
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, rgba(70,88,204,0.2) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(70, 88, 204, 0.2) 0%, transparent 70%);
       pointer-events: none;
     }
+
     .about-inner {
       max-width: 700px;
       margin: 0 auto;
       position: relative;
       z-index: 1;
     }
+
     .about-eyebrow {
-      font-size: 12px;
+      font-size: 36px;
       font-weight: 700;
-      text-transform: uppercase;
       letter-spacing: 0.12em;
       color: #818cf8;
       margin-bottom: 20px;
     }
+
     .about-title {
       font-size: 38px;
       font-weight: 800;
@@ -2041,13 +2478,20 @@
       line-height: 1.2;
       margin-bottom: 28px;
     }
-    @media (max-width: 600px) { .about-title { font-size: 26px; } }
+
+    @media (max-width: 600px) {
+      .about-title {
+        font-size: 26px;
+      }
+    }
+
     .about-body {
       font-size: 17px;
       color: #94a3b8;
       line-height: 1.8;
       font-style: italic;
     }
+
     .about-divider {
       width: 48px;
       height: 3px;
@@ -2063,25 +2507,33 @@
       padding: 100px 24px;
       background-color: var(--bg-body);
     }
+
     .section-heading {
       text-align: center;
       margin-bottom: 56px;
     }
+
     .section-heading .eyebrow {
-      font-size: 12px;
+      font-size: 36px;
       font-weight: 700;
-      text-transform: uppercase;
       letter-spacing: 0.12em;
       color: var(--primary);
       margin-bottom: 12px;
     }
+
     .section-heading h2 {
       font-size: 32px;
       font-weight: 800;
       color: var(--text-main);
       line-height: 1.25;
     }
-    @media (max-width: 600px) { .section-heading h2 { font-size: 24px; } }
+
+    @media (max-width: 600px) {
+      .section-heading h2 {
+        font-size: 24px;
+      }
+    }
+
     .benefits-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -2089,6 +2541,7 @@
       max-width: 900px;
       margin: 0 auto;
     }
+
     .benefit-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border-color);
@@ -2097,11 +2550,13 @@
       box-shadow: var(--shadow-sm);
       transition: var(--transition);
     }
+
     .benefit-card:hover {
       transform: translateY(-4px);
       box-shadow: var(--shadow-md);
       border-color: var(--primary);
     }
+
     .benefit-icon {
       width: 52px;
       height: 52px;
@@ -2113,15 +2568,18 @@
       font-size: 24px;
       margin-bottom: 20px;
     }
+
     body.dark-mode .benefit-icon {
-      background: rgba(70,88,204,0.18);
+      background: rgba(70, 88, 204, 0.18);
     }
+
     .benefit-card h3 {
       font-size: 17px;
       font-weight: 800;
       color: var(--text-main);
       margin-bottom: 10px;
     }
+
     .benefit-card p {
       font-size: 14px;
       color: var(--text-muted);
@@ -2135,7 +2593,11 @@
       padding: 100px 24px;
       background: var(--bg-card);
     }
-    body.dark-mode #section-faq { background: #0e1629; }
+
+    body.dark-mode #section-faq {
+      background: #0e1629;
+    }
+
     .faq-list {
       max-width: 720px;
       margin: 0 auto;
@@ -2143,6 +2605,7 @@
       flex-direction: column;
       gap: 12px;
     }
+
     .faq-item {
       border: 1.5px solid var(--border-color);
       border-radius: 14px;
@@ -2150,9 +2613,11 @@
       background: var(--bg-body);
       transition: border-color 0.2s ease;
     }
+
     .faq-item.open {
       border-color: var(--primary);
     }
+
     .faq-question {
       width: 100%;
       text-align: left;
@@ -2169,6 +2634,7 @@
       align-items: center;
       gap: 12px;
     }
+
     .faq-question .faq-chevron {
       flex-shrink: 0;
       width: 20px;
@@ -2176,9 +2642,11 @@
       color: var(--primary);
       transition: transform 0.3s ease;
     }
+
     .faq-item.open .faq-chevron {
       transform: rotate(180deg);
     }
+
     .faq-answer {
       max-height: 0;
       overflow: hidden;
@@ -2187,6 +2655,7 @@
       color: var(--text-muted);
       line-height: 1.7;
     }
+
     .faq-answer-inner {
       padding: 0 20px 18px;
     }
@@ -2198,9 +2667,11 @@
       padding: 80px 24px;
       background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
     }
+
     body.dark-mode #section-custom {
       background: linear-gradient(135deg, #0f1729 0%, #1a2340 100%);
     }
+
     .custom-words-box {
       max-width: 680px;
       margin: 0 auto;
@@ -2210,23 +2681,27 @@
       padding: 36px;
       box-shadow: var(--shadow-md);
     }
+
     .custom-words-box h3 {
       font-size: 20px;
       font-weight: 800;
       color: var(--text-main);
       margin-bottom: 6px;
     }
+
     .custom-words-box .custom-desc {
       font-size: 14px;
       color: var(--text-muted);
       margin-bottom: 20px;
       line-height: 1.6;
     }
+
     .custom-input-row {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
     }
+
     .custom-words-input {
       flex: 1;
       min-width: 200px;
@@ -2241,17 +2716,26 @@
       outline: none;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
+
     .custom-words-input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(70,88,204,0.1);
+      box-shadow: 0 0 0 3px rgba(70, 88, 204, 0.1);
     }
+
     .custom-hint {
       font-size: 12px;
       color: var(--text-muted);
       margin-top: 8px;
     }
-    .custom-hint.error { color: #ef4444; }
-    .custom-hint.success { color: #16a34a; }
+
+    .custom-hint.error {
+      color: #ef4444;
+    }
+
+    .custom-hint.success {
+      color: #16a34a;
+    }
+
     .btn-custom-apply {
       font-family: inherit;
       font-size: 14px;
@@ -2265,10 +2749,12 @@
       transition: var(--transition);
       white-space: nowrap;
     }
+
     .btn-custom-apply:hover {
       background: var(--primary-hover);
       transform: translateY(-1px);
     }
+
     .btn-share-pool {
       width: 100%;
       margin-top: 14px;
@@ -2287,9 +2773,11 @@
       justify-content: center;
       gap: 8px;
     }
+
     .btn-share-pool:hover {
-      background: rgba(70,88,204,0.08);
+      background: rgba(70, 88, 204, 0.08);
     }
+
     .share-url-box {
       display: none;
       margin-top: 14px;
@@ -2301,12 +2789,17 @@
       flex-direction: column;
       gap: 8px;
     }
-    .share-url-box.visible { display: flex; }
+
+    .share-url-box.visible {
+      display: flex;
+    }
+
     .share-url-text {
       font-size: 13px;
       color: var(--text-muted);
       word-break: break-all;
     }
+
     .btn-copy-url {
       font-family: inherit;
       font-size: 12px;
@@ -2320,7 +2813,10 @@
       align-self: flex-start;
       transition: var(--transition);
     }
-    .btn-copy-url:hover { background: var(--primary-hover); }
+
+    .btn-copy-url:hover {
+      background: var(--primary-hover);
+    }
 
     /* ==========================================
        FEEDBACK SECTION
@@ -2329,6 +2825,7 @@
       padding: 100px 24px;
       background: var(--bg-body);
     }
+
     .feedback-form-box {
       max-width: 620px;
       margin: 0 auto;
@@ -2338,9 +2835,11 @@
       padding: 40px;
       box-shadow: var(--shadow-md);
     }
+
     .feedback-field {
       margin-bottom: 18px;
     }
+
     .feedback-field label {
       display: block;
       font-size: 13px;
@@ -2348,6 +2847,7 @@
       color: var(--text-main);
       margin-bottom: 6px;
     }
+
     .feedback-field input,
     .feedback-field textarea {
       width: 100%;
@@ -2362,15 +2862,18 @@
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
       box-sizing: border-box;
     }
+
     .feedback-field textarea {
       height: 120px;
       resize: none;
     }
+
     .feedback-field input:focus,
     .feedback-field textarea:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(70,88,204,0.1);
+      box-shadow: 0 0 0 3px rgba(70, 88, 204, 0.1);
     }
+
     .btn-submit-feedback {
       width: 100%;
       font-family: inherit;
@@ -2383,17 +2886,20 @@
       color: white;
       cursor: pointer;
       transition: var(--transition);
-      box-shadow: 0 4px 14px rgba(70,88,204,0.3);
+      box-shadow: 0 4px 14px rgba(70, 88, 204, 0.3);
     }
+
     .btn-submit-feedback:hover {
       background: var(--primary-hover);
       transform: translateY(-2px);
     }
+
     .btn-submit-feedback:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
     }
+
     .feedback-success {
       display: none;
       margin-top: 16px;
@@ -2406,7 +2912,10 @@
       color: #15803d;
       text-align: center;
     }
-    .feedback-success.show { display: block; }
+
+    .feedback-success.show {
+      display: block;
+    }
 
     /* ==========================================
        IMPROVED RATING SECTION
@@ -2414,6 +2923,7 @@
     #rating-section {
       font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
+
     .game-logo {
       width: 64px;
       height: 64px;
@@ -2434,7 +2944,11 @@
       font-size: 13px;
       color: #475569;
     }
-    .site-footer a { color: #818cf8; text-decoration: none; }
+
+    .site-footer a {
+      color: #818cf8;
+      text-decoration: none;
+    }
   </style>
 </head>
 
@@ -2444,18 +2958,73 @@
        STICKY NAVBAR
        ================================================ -->
   <nav class="site-nav" id="site-nav">
-    <img src="/static/logo.png" alt="Weave Words" class="nav-logo">
-    <div class="nav-links">
-      <a href="#section-game">Bermain</a>
-      <a href="#section-about">Tentang</a>
-      <a href="#section-benefits">Manfaat</a>
-      <a href="#section-faq">FAQ</a>
-      <a href="#section-feedback">Saran</a>
+    <img src="/static/logo.png" alt="Weave Words" class="nav-logo" id="nav-logo">
+    <div class="nav-right">
+      <div class="nav-links" id="nav-links">
+        <a href="#section-game" id="nav-link-game">Bermain</a>
+        <a href="#section-about" id="nav-link-about">Tentang</a>
+        <a href="#section-benefits" id="nav-link-benefits">Manfaat</a>
+        <a href="#section-faq" id="nav-link-faq">FAQ</a>
+        <a href="#section-feedback" id="nav-link-feedback">Saran</a>
+      </div>
+
+      <div class="nav-controls">
+        <!-- Language Selector -->
+        <div class="lang-selector">
+          <button class="control-btn lang-btn" onclick="toggleLangDropdown(event)">
+            <img id="current-lang-flag" src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;"
+              alt="flag"> <span id="current-lang-text">ID</span>
+          </button>
+          <div class="lang-dropdown" id="lang-dropdown">
+            <div class="lang-option" onclick="changeLanguage('id')">
+              <img src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;" alt="ID">
+              <span>Indonesia (ID)</span>
+            </div>
+            <div class="lang-option" onclick="changeLanguage('en')">
+              <img src="https://flagcdn.com/w20/gb.png" width="18" style="border-radius: 2px;" alt="EN"> <span>English
+                (EN)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Button -->
+        <button class="control-btn" onclick="openSettingsModal()" title="Pengaturan">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
+        </button>
+
+        <!-- Help/Tutorial Button -->
+        <button class="control-btn" onclick="openTutorialModal()" title="Cara Bermain">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+      </div>
+
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Menu" onclick="toggleNavMenu(event)">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
     </div>
   </nav>
 
   <!-- Welcome Modal Card -->
   <div class="welcome-backdrop active" id="welcome-backdrop">
+    <script>
+      if (localStorage.getItem('hasPlayedBefore') === 'true') {
+        document.getElementById('welcome-backdrop').classList.remove('active');
+        document.getElementById('welcome-backdrop').style.display = 'none';
+      }
+    </script>
     <div class="welcome-card">
       <img src="/static/logo.png" alt="Weave Words Logo" class="welcome-logo">
       <p class="welcome-description">Tenun kata tak berhubungan menjadi paragraf utuh</p>
@@ -2534,6 +3103,7 @@
           <label class="settings-label" id="settings-label-minparagraphs">Minimal Paragraf (tiap paragraf min. 2
             kalimat):</label>
           <select id="settings-select-minparagraphs" class="settings-select">
+            <option value="0">Tanpa Minimal Paragraf</option>
             <option value="1">1 Paragraf</option>
             <option value="2">2 Paragraf</option>
             <option value="3">3 Paragraf</option>
@@ -2569,519 +3139,566 @@
        ================================================ -->
   <div class="landing-page">
 
-  <!-- ================================================
+    <!-- ================================================
        SECTION 1: HERO / GAME
        ================================================ -->
-  <section id="section-game">
-  <div class="game-wrapper">
-    <div class="app-container">
-      <!-- Header / Logo -->
-      <header>
-        <div class="logo-container">
-          <img src="/static/logo.png" alt="Weave Words Logo" id="app-logo"
-            style="height: 60px; display: block; max-width: 100%; object-fit: contain;">
+    <section id="section-game">
+      <div class="game-wrapper">
+        <!-- Level Selection -->
+        <div class="level-section">
+          <span class="section-label" id="label-level">Level:</span>
+          <div class="level-buttons">
+            <button class="btn-level active" data-level="mudah" onclick="selectLevel('mudah')">mudah</button>
+            <button class="btn-level" data-level="sedang" onclick="selectLevel('sedang')">sedang</button>
+            <button class="btn-level" data-level="sulit" onclick="selectLevel('sulit')">sulit</button>
+          </div>
         </div>
 
-        <div class="header-controls">
-          <!-- Language Selector -->
-          <div class="lang-selector">
-            <button class="control-btn lang-btn" onclick="toggleLangDropdown(event)">
-              <img id="current-lang-flag" src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;"
-                alt="flag"> <span id="current-lang-text">ID</span>
-            </button>
-            <div class="lang-dropdown" id="lang-dropdown">
-              <div class="lang-option" onclick="changeLanguage('id')">
-                <img src="https://flagcdn.com/w20/id.png" width="18" style="border-radius: 2px;" alt="ID">
-                <span>Indonesia (ID)</span>
-              </div>
-              <div class="lang-option" onclick="changeLanguage('en')">
-                <img src="https://flagcdn.com/w20/gb.png" width="18" style="border-radius: 2px;" alt="EN"> <span>English
-                  (EN)</span>
+        <!-- Words Section -->
+        <div class="words-section">
+          <div class="words-header"
+            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <span class="section-label" id="label-words">Kata - kata yang harus dipakai:</span>
+            <!-- Three dots circular button & dropdown menu -->
+            <div class="words-menu-container" style="position: relative;">
+              <button class="control-btn" id="words-menu-btn" onclick="toggleWordsMenu(event)" title="Menu Kata">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <circle cx="5" cy="12" r="2"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                  <circle cx="19" cy="12" r="2"></circle>
+                </svg>
+              </button>
+              <div class="words-dropdown" id="words-dropdown" style="display: none;">
+                <button class="words-dropdown-item" id="menu-btn-custom" onclick="triggerMenuCustom(event)">
+                  <span class="icon">⚙️</span> <span id="text-menu-custom">Custom</span>
+                </button>
+                <button class="words-dropdown-item" id="menu-btn-share" onclick="triggerMenuShare(event)">
+                  <span class="icon">🔗</span> <span id="text-menu-share">Bagikan Variasi</span>
+                </button>
+                <button class="words-dropdown-item" id="menu-btn-reload" onclick="triggerMenuReload(event)">
+                  <span class="icon">↻</span> <span id="text-menu-reload">Ganti Kata</span>
+                </button>
               </div>
             </div>
           </div>
 
-          <!-- Settings Button -->
-          <button class="control-btn" onclick="openSettingsModal()" title="Pengaturan">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path
-                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
-              </path>
-            </svg>
-          </button>
+          <!-- Custom Words Section -->
+          <div class="custom-words-container"
+            style="display: none; width: 100%; margin-top: 12px; margin-bottom: 12px;">
+            <div
+              style="font-size: 13.5px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center;">
+              <span id="text-custom-title">Tantangan Kata Kustom</span>
+              <span style="font-size: 11.5px; font-weight: 600; color: var(--text-muted);" id="custom-words-count">0/10
+                kata</span>
+            </div>
+            <div class="chip-input-wrapper" id="chip-input-wrapper">
+              <div id="custom-chips-list" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+              <input type="text" id="custom-input-field" placeholder="Ketik kata lalu spasi..." />
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+              <button class="btn-custom-apply" id="btn-custom-play" onclick="playCustomWords()"
+                style="flex: 1; min-height: 40px; padding: 8px 16px; font-size: 13.5px; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                disabled>
+                🎮 <span id="text-custom-play">Mainkan Kata Ini</span>
+              </button>
+              <button class="btn-share-pool" id="btn-custom-share" onclick="shareCustomPool()"
+                style="flex: 1; margin: 0; min-height: 40px; padding: 8px 16px; font-size: 13.5px; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                disabled>
+                🔗 <span id="text-custom-share">Bagikan Link Kata</span>
+              </button>
+            </div>
+            <div class="share-url-box" id="custom-share-url-box" style="margin-top: 10px; display: none;">
+              <p class="share-url-text" id="custom-share-url-text" style="font-size: 12px; margin-bottom: 6px;"></p>
+              <button class="btn-copy-url" onclick="copyCustomShareUrl()" id="btn-copy-custom-url"
+                style="width: 100%;">Salin Link</button>
+            </div>
+            <p class="custom-hint" id="custom-input-hint"
+              style="margin-top: 6px; font-size: 11.5px; color: var(--text-muted);">Masukkan 3 hingga 10 kata, pisahkan
+              dengan spasi.</p>
+          </div>
 
-          <!-- Help/Tutorial Button -->
-          <button class="control-btn" onclick="openTutorialModal()" title="Cara Bermain">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-          </button>
-        </div>
-      </header>
-
-      <!-- Level Selection -->
-      <div class="level-section">
-        <span class="section-label" id="label-level">Level:</span>
-        <div class="level-buttons">
-          <button class="btn-level active" data-level="mudah" onclick="selectLevel('mudah')">mudah</button>
-          <button class="btn-level" data-level="sedang" onclick="selectLevel('sedang')">sedang</button>
-          <button class="btn-level" data-level="sulit" onclick="selectLevel('sulit')">sulit</button>
-        </div>
-      </div>
-
-      <!-- Words Section -->
-      <div class="words-section">
-        <div class="words-header">
-          <span class="section-label" id="label-words">Kata - kata yang harus dipakai:</span>
-          <button class="btn-change-words" onclick="fetchNewWords()">
-            <span id="text-change-words">Ganti kata</span> <span class="reload-icon">↻</span>
-          </button>
-        </div>
-        <div class="words-list" id="words-list">
-          <!-- Words loaded dynamically -->
-        </div>
-      </div>
-
-      <!-- Writing Area -->
-      <div class="writing-section">
-        <div class="writing-header">
-          <span class="section-label" id="label-essay">Paragraf:</span>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span id="time-display" style="display: none;"></span>
-            <span class="word-counter" id="word-counter">0 kata</span>
+          <div class="words-list" id="words-list">
+            <!-- Words loaded dynamically -->
           </div>
         </div>
-        <!-- Settings Info Badges -->
-        <div class="settings-badges-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
-          <span class="badge" id="badge-theme"
-            style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background-color: var(--bg-body); border: 1.5px solid var(--border-color); color: var(--text-muted);">Tema:
-            Bebas</span>
-          <span class="badge" id="badge-min-paragraphs"
-            style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background-color: var(--bg-body); border: 1.5px solid var(--border-color); color: var(--text-muted);">Minimal
-            1 Paragraf</span>
-          <span class="badge" id="badge-min-words"
-            style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background-color: var(--bg-body); border: 1.5px solid var(--border-color); color: var(--text-muted); display: none;">Minimal
-            0 Kata</span>
-        </div>
-        <textarea id="essay-input" placeholder="Rangkai kata-kata di atas menjadi sebuah paragraf yang padu..."
-          oninput="onEssayInput()"></textarea>
 
-        <button class="btn-submit incomplete" id="btn-submit" onclick="submitEssay()">
-          Nilai tulisanku &rarr;
+        <!-- Writing Area -->
+        <div class="writing-section">
+          <div class="writing-header">
+            <span class="section-label" id="label-essay">Paragraf:</span>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span id="time-display" style="display: none;"></span>
+              <span class="word-counter" id="word-counter">0 kata</span>
+            </div>
+          </div>
+          <!-- Settings Info Badges -->
+          <div class="settings-badges-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+            <span class="badge" id="badge-theme"
+              style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background-color: var(--bg-body); border: 1.5px solid var(--border-color); color: var(--text-muted);">Tema:
+              Bebas</span>
+            <span class="badge" id="badge-min-paragraphs"
+              style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background-color: var(--bg-body); border: 1.5px solid var(--border-color); color: var(--text-muted);">Minimal
+              1 Paragraf</span>
+            <span class="badge" id="badge-min-words"
+              style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background-color: var(--bg-body); border: 1.5px solid var(--border-color); color: var(--text-muted); display: none;">Minimal
+              0 Kata</span>
+          </div>
+          <textarea id="essay-input" placeholder="Rangkai kata-kata di atas menjadi sebuah paragraf yang padu..."
+            oninput="onEssayInput()"></textarea>
+
+          <button class="btn-submit incomplete" id="btn-submit" onclick="submitEssay()">
+            Nilai tulisanku &rarr;
+          </button>
+          <div id="error-popup" class="error-popup"></div>
+        </div>
+
+        <!-- Loading Screen -->
+        <div class="loading-container" id="loading-container" style="display: none;">
+          <img src="/static/load.gif" alt="Loading" class="loading-gif">
+          <p id="text-loading">Menilai tulisan...</p>
+        </div>
+
+        <!-- Results Dashboard -->
+        <div class="results-section" id="results-section" style="display: none;">
+          <div class="results-modal-card">
+            <button class="modal-close" onclick="closeResultsModal()"
+              style="position: absolute; top: 20px; right: 28px;">&times;</button>
+            <h2 class="results-title" id="text-results-title">Hasil Penilaian:</h2>
+
+            <div class="results-flex-layout">
+              <!-- Left Column: Metrics & Feedback -->
+              <div class="results-left-col">
+                <div class="results-grid">
+                  <!-- Card 1: Koherensi -->
+                  <div class="result-card">
+                    <div class="card-info">
+                      <h3 class="card-title" id="title-koherensi">Koherensi</h3>
+                      <p class="card-feedback" id="feedback-koherensi">Penilaian koherensi akan muncul di sini.</p>
+                      <button class="btn-read-more" id="readmore-koherensi" onclick="openModal('koherensi')">Baca
+                        selengkapnya</button>
+                    </div>
+                    <div class="card-gauge">
+                      <svg viewBox="0 0 36 36" class="gauge-svg">
+                        <path class="gauge-bg"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="gauge-fill" id="fill-koherensi"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="20.8" class="gauge-text" id="text-koherensi">0%</text>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <!-- Card 2: Kebahasaan -->
+                  <div class="result-card">
+                    <div class="card-info">
+                      <h3 class="card-title" id="title-kebahasaan">Kebahasaan</h3>
+                      <p class="card-feedback" id="feedback-kebahasaan">Penilaian kebahasaan akan muncul di sini.</p>
+                      <button class="btn-read-more" id="readmore-kebahasaan" onclick="openModal('kebahasaan')">Baca
+                        selengkapnya</button>
+                    </div>
+                    <div class="card-gauge">
+                      <svg viewBox="0 0 36 36" class="gauge-svg">
+                        <path class="gauge-bg"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="gauge-fill" id="fill-kebahasaan"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="20.8" class="gauge-text" id="text-kebahasaan">0%</text>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <!-- Card 3: Kreativitas -->
+                  <div class="result-card">
+                    <div class="card-info">
+                      <h3 class="card-title" id="title-kreativitas">Kreativitas</h3>
+                      <p class="card-feedback" id="feedback-kreativitas">Penilaian kreativitas akan muncul di sini.</p>
+                      <button class="btn-read-more" id="readmore-kreativitas" onclick="openModal('kreativitas')">Baca
+                        selengkapnya</button>
+                    </div>
+                    <div class="card-gauge">
+                      <svg viewBox="0 0 36 36" class="gauge-svg">
+                        <path class="gauge-bg"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="gauge-fill" id="fill-kreativitas"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="20.8" class="gauge-text" id="text-kreativitas">0%</text>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <!-- Card 4: Penggunaan Kata -->
+                  <div class="result-card">
+                    <div class="card-info">
+                      <h3 class="card-title" id="title-penggunaan_kata">Penggunaan Kata</h3>
+                      <p class="card-feedback" id="feedback-penggunaan_kata">Penilaian ketepatan kata akan muncul di
+                        sini.
+                      </p>
+                      <button class="btn-read-more" id="readmore-penggunaan_kata"
+                        onclick="openModal('penggunaan_kata')">Baca selengkapnya</button>
+                    </div>
+                    <div class="card-gauge">
+                      <svg viewBox="0 0 36 36" class="gauge-svg">
+                        <path class="gauge-bg"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="gauge-fill" id="fill-penggunaan_kata"
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="20.8" class="gauge-text" id="text-penggunaan_kata">0%</text>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Overall Summary -->
+                <div class="overall-feedback-container">
+                  <div class="overall-title">Feedback Keseluruhan:</div>
+                  <div class="overall-text" id="overall-feedback-text">Memuat penilaian...</div>
+                </div>
+              </div>
+
+              <!-- Right Column: Share Preview Image & Action Buttons -->
+              <div class="results-right-col">
+                <div class="share-preview-box">
+                  <div class="share-preview-loading" id="share-preview-loading">
+                    <div class="spinner-small"></div>
+                    <span id="text-generating-image">Membuat gambar...</span>
+                  </div>
+                  <img id="results-share-preview" src="" alt="Share Preview" style="display: none;">
+                </div>
+
+                <div class="share-actions-stack">
+                  <button class="btn-share-action" onclick="downloadImageDirectly()" id="btn-download-img">
+                    📥 Download Gambar
+                  </button>
+                  <button class="btn-share-action secondary" onclick="copyCaptionOnly()" id="btn-copy-caption-results">
+                    📋 Salin Caption
+                  </button>
+                  <button class="btn-share-action play-again" onclick="resetGame()" id="btn-play-again-results">
+                    Main Lagi!
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div> <!-- Closes .results-modal-card -->
+        </div> <!-- Closes .results-section -->
+
+
+
+      </div> <!-- Closes .game-wrapper -->
+    </section> <!-- Closes #section-game -->
+
+    <!-- ================================================
+       SECTION 2: ABOUT
+       ================================================ -->
+    <!-- ================================================
+       SECTION 2: ABOUT
+       ================================================ -->
+    <section id="section-about">
+      <div class="about-inner">
+        <p class="about-eyebrow" id="text-about-eyebrow">Latar Belakang</p>
+        <h2 class="about-title" id="text-about-title">Mengapa Weave Words Hadir?</h2>
+        <p class="about-body" id="text-about-body">
+          Dibuat atas keprihatinan terhadap masifnya penggunaan AI yang mengambil alih tugas-tugas kecil — seperti
+          menyusun kalimat. Hal ini berpotensi mengurangi kemampuan verbal-linguistik manusia dan kemandirian dalam
+          merangkai kata. Weave Words hadir sebagai wadah latihan intensif menulis dan mengasah kembali ketajaman
+          kognitif linguistik yang mulai tumpul di era serba-otomatis ini.
+        </p>
+        <div class="about-divider"></div>
+      </div>
+    </section>
+
+    <!-- ================================================
+       SECTION 3: BENEFITS
+       ================================================ -->
+    <section id="section-benefits">
+      <div class="section-heading">
+        <p class="eyebrow" id="text-benefits-eyebrow">Kenapa Berlatih di Sini?</p>
+        <h2 id="text-benefits-title">Manfaat yang Kamu Dapatkan</h2>
+      </div>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">✍️</div>
+          <h3 id="text-benefit1-title">Menajamkan Kemampuan Menulis Mandiri</h3>
+          <p id="text-benefit1-desc">Latih dirimu merangkai kalimat tanpa bantuan AI. Kemampuan menulis yang diasah
+            secara mandiri adalah aset kognitif yang tak ternilai.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">💡</div>
+          <h3 id="text-benefit2-title">Meningkatkan Kreativitas &amp; Imajinasi</h3>
+          <p id="text-benefit2-desc">Setiap sesi memaksamu menghubungkan kata-kata acak menjadi narasi yang koheren —
+            mendorong otak untuk berpikir lateral dan kreatif.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">⚡</div>
+          <h3 id="text-benefit3-title">Melatih Kecepatan Berpikir Struktur Kalimat</h3>
+          <p id="text-benefit3-desc">Dengan mode timer, kamu dilatih untuk menyusun kalimat yang logis di bawah tekanan
+            waktu — skill krusial dalam komunikasi nyata.</p>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- ================================================
+       SECTION 5: FAQ
+       ================================================ -->
+    <section id="section-faq">
+      <div class="section-heading">
+        <p class="eyebrow" id="text-faq-eyebrow">Pertanyaan Umum</p>
+        <h2 id="text-faq-title">FAQ</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span id="text-faq-q1">Bagaimana cara bermain Weave Words?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" id="text-faq-a1">Pilih level kesulitan (mudah, sedang, sulit), lalu gunakan
+              semua kata yang ditampilkan dalam satu paragraf yang koheren. Klik "Nilai tulisanku" untuk mendapat
+              penilaian dari AI.</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span id="text-faq-q2">Apa yang dinilai oleh AI?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" id="text-faq-a2">AI menilai 4 aspek: Koherensi (kepaduan antar kalimat),
+              Kebahasaan (tata bahasa & EYD), Kreativitas (orisinalitas ide), dan Penggunaan Kata (ketepatan makna kata
+              dalam konteks).</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span id="text-faq-q3">Apakah saya harus login untuk bermain?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" id="text-faq-a3">Tidak! Weave Words sepenuhnya bisa dimainkan tanpa akun.
+              Cukup buka halaman ini dan langsung bermain. Rating dan progresmu tersimpan di browser lokal.</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span id="text-faq-q4">Bagaimana cara berbagi tantangan kata ke teman?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" id="text-faq-a4">Klik tombol "Custom ⚙️" di sebelah "Ganti Kata", masukkan
+              kata-kata pilihanmu, lalu klik "Bagikan Link Kata". Kirim URL yang dihasilkan ke temanmu agar mereka
+              langsung bisa bermain dengan kata yang sama!</div>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span id="text-faq-q5">Apakah ada perbedaan level kesulitan?</span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner" id="text-faq-a5">Ya. Level "Mudah" memberikan kata-kata yang umum dan mudah
+              dirangkai. Level "Sedang" menggunakan kata dengan makna yang lebih beragam. Level "Sulit" menggabungkan
+              kata-kata tidak lazim yang membutuhkan kreativitas tinggi.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================
+       SECTION 6: FEEDBACK FORM (Firebase)
+       ================================================ -->
+    <section id="section-feedback">
+      <div class="section-heading">
+        <p class="eyebrow" id="text-feedback-eyebrow">Suaramu Penting</p>
+        <h2 id="text-feedback-title">Kirim Saran & Masukan</h2>
+      </div>
+      <div class="feedback-form-box">
+        <div class="feedback-field">
+          <label for="fb-name" id="text-fb-label-name">Nama</label>
+          <input type="text" id="fb-name" placeholder="Nama kamu" autocomplete="name">
+        </div>
+        <div class="feedback-field">
+          <label for="fb-email" id="text-fb-label-email">Email (opsional)</label>
+          <input type="email" id="fb-email" placeholder="email@contoh.com" autocomplete="email">
+        </div>
+        <div class="feedback-field">
+          <label for="fb-message" id="text-fb-label-message">Pesan / Saran</label>
+          <textarea id="fb-message"
+            placeholder="Ceritakan pengalamanmu atau sampaikan saran untuk perbaikan..."></textarea>
+        </div>
+        <button class="btn-submit-feedback" id="btn-submit-feedback" onclick="submitFeedback()">
+          Kirim Masukan ✉️
         </button>
-        <div id="error-popup" class="error-popup"></div>
-      </div>
-
-      <!-- Loading Screen -->
-      <div class="loading-container" id="loading-container" style="display: none;">
-        <div class="spinner"></div>
-        <p id="text-loading">Menilai esai oleh AI...</p>
-      </div>
-    </div>
-
-    <!-- Results Dashboard -->
-    <div class="results-section" id="results-section" style="display: none;">
-      <div class="results-modal-card">
-        <button class="modal-close" onclick="closeResultsModal()"
-          style="position: absolute; top: 20px; right: 28px;">&times;</button>
-        <h2 class="results-title" id="text-results-title">Hasil Penilaian:</h2>
-
-        <div class="results-flex-layout">
-          <!-- Left Column: Metrics & Feedback -->
-          <div class="results-left-col">
-            <div class="results-grid">
-              <!-- Card 1: Koherensi -->
-              <div class="result-card">
-                <div class="card-info">
-                  <h3 class="card-title" id="title-koherensi">Koherensi</h3>
-                  <p class="card-feedback" id="feedback-koherensi">Penilaian koherensi akan muncul di sini.</p>
-                  <button class="btn-read-more" id="readmore-koherensi" onclick="openModal('koherensi')">Baca
-                    selengkapnya</button>
-                </div>
-                <div class="card-gauge">
-                  <svg viewBox="0 0 36 36" class="gauge-svg">
-                    <path class="gauge-bg"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="gauge-fill" id="fill-koherensi"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <text x="18" y="20.8" class="gauge-text" id="text-koherensi">0%</text>
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Card 2: Kebahasaan -->
-              <div class="result-card">
-                <div class="card-info">
-                  <h3 class="card-title" id="title-kebahasaan">Kebahasaan</h3>
-                  <p class="card-feedback" id="feedback-kebahasaan">Penilaian kebahasaan akan muncul di sini.</p>
-                  <button class="btn-read-more" id="readmore-kebahasaan" onclick="openModal('kebahasaan')">Baca
-                    selengkapnya</button>
-                </div>
-                <div class="card-gauge">
-                  <svg viewBox="0 0 36 36" class="gauge-svg">
-                    <path class="gauge-bg"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="gauge-fill" id="fill-kebahasaan"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <text x="18" y="20.8" class="gauge-text" id="text-kebahasaan">0%</text>
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Card 3: Kreativitas -->
-              <div class="result-card">
-                <div class="card-info">
-                  <h3 class="card-title" id="title-kreativitas">Kreativitas</h3>
-                  <p class="card-feedback" id="feedback-kreativitas">Penilaian kreativitas akan muncul di sini.</p>
-                  <button class="btn-read-more" id="readmore-kreativitas" onclick="openModal('kreativitas')">Baca
-                    selengkapnya</button>
-                </div>
-                <div class="card-gauge">
-                  <svg viewBox="0 0 36 36" class="gauge-svg">
-                    <path class="gauge-bg"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="gauge-fill" id="fill-kreativitas"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <text x="18" y="20.8" class="gauge-text" id="text-kreativitas">0%</text>
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Card 4: Penggunaan Kata -->
-              <div class="result-card">
-                <div class="card-info">
-                  <h3 class="card-title" id="title-penggunaan_kata">Penggunaan Kata</h3>
-                  <p class="card-feedback" id="feedback-penggunaan_kata">Penilaian ketepatan kata akan muncul di sini.
-                  </p>
-                  <button class="btn-read-more" id="readmore-penggunaan_kata"
-                    onclick="openModal('penggunaan_kata')">Baca selengkapnya</button>
-                </div>
-                <div class="card-gauge">
-                  <svg viewBox="0 0 36 36" class="gauge-svg">
-                    <path class="gauge-bg"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path class="gauge-fill" id="fill-penggunaan_kata"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <text x="18" y="20.8" class="gauge-text" id="text-penggunaan_kata">0%</text>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- Overall Summary -->
-            <div class="overall-feedback-container">
-              <div class="overall-title">Feedback Keseluruhan:</div>
-              <div class="overall-text" id="overall-feedback-text">Memuat penilaian...</div>
-            </div>
-          </div>
-
-          <!-- Right Column: Share Preview Image & Action Buttons -->
-          <div class="results-right-col">
-            <div class="share-preview-box">
-              <div class="share-preview-loading" id="share-preview-loading">
-                <div class="spinner-small"></div>
-                <span id="text-generating-image">Membuat gambar...</span>
-              </div>
-              <img id="results-share-preview" src="" alt="Share Preview" style="display: none;">
-            </div>
-
-            <div class="share-actions-stack">
-              <button class="btn-share-action" onclick="downloadImageDirectly()" id="btn-download-img">
-                📥 Download Gambar
-              </button>
-              <button class="btn-share-action secondary" onclick="copyCaptionOnly()" id="btn-copy-caption-results">
-                📋 Salin Caption
-              </button>
-              <button class="btn-share-action play-again" onclick="resetGame()" id="btn-play-again-results">
-                Main Lagi!
-              </button>
-            </div>
-          </div>
+        <div class="feedback-success" id="feedback-success">
+          ✅ Terima kasih! Masukanmu sudah kami terima dan akan sangat membantu.
         </div>
-      </div> <!-- Closes .results-modal-card -->
-    </div> <!-- Closes .results-section -->
+      </div>
+    </section>
 
     <!-- Rating Section -->
     <div id="rating-section" style="
-      width: 100%;
-      max-width: 640px;
-      margin: 24px auto 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: inherit;
-    ">
-    <div id="rating-card" style="
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 16px;
-      padding: 24px;
+    width: 90%;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: inherit;
+  ">
+      <img src="/static/logo.png" alt="Weave Words Logo" class="rating-logo" id="rating-logo"
+        style="height: 48px; display: block; margin: 0 auto 20px; max-width: 100%; object-fit: contain; pointer-events: none; user-select: none;">
+      <div id="rating-card" style="
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
       text-align: center;
-      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow-sm);
     ">
-      <p style="margin: 0 0 6px; font-size: 14px; opacity: 0.6; letter-spacing: 0.05em; text-transform: uppercase;">Rate this game</p>
-      <div id="rating-stars" style="display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; cursor: pointer;">
-        <span class="rating-star" data-val="1" style="font-size: 36px; transition: transform 0.15s;">☆</span>
-        <span class="rating-star" data-val="2" style="font-size: 36px; transition: transform 0.15s;">☆</span>
-        <span class="rating-star" data-val="3" style="font-size: 36px; transition: transform 0.15s;">☆</span>
-        <span class="rating-star" data-val="4" style="font-size: 36px; transition: transform 0.15s;">☆</span>
-        <span class="rating-star" data-val="5" style="font-size: 36px; transition: transform 0.15s;">☆</span>
+        <p style="margin: 0 0 8px; font-size: 14px; opacity: 0.7; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700; color: var(--text-muted);"
+          id="rating-title-text">Rate this game</p>
+        <div id="rating-stars"
+          style="display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; cursor: pointer;">
+          <span class="rating-star" data-val="1"
+            style="font-size: 36px; transition: transform 0.15s; color: var(--text-muted);">☆</span>
+          <span class="rating-star" data-val="2"
+            style="font-size: 36px; transition: transform 0.15s; color: var(--text-muted);">☆</span>
+          <span class="rating-star" data-val="3"
+            style="font-size: 36px; transition: transform 0.15s; color: var(--text-muted);">☆</span>
+          <span class="rating-star" data-val="4"
+            style="font-size: 36px; transition: transform 0.15s; color: var(--text-muted);">☆</span>
+          <span class="rating-star" data-val="5"
+            style="font-size: 36px; transition: transform 0.15s; color: var(--text-muted);">☆</span>
+        </div>
+        <div id="rating-summary"
+          style="font-size: 13.5px; font-weight: 600; color: var(--text-muted); min-height: 18px;">Memuat rating...
+        </div>
+        <div id="rating-thankyou"
+          style="display:none; font-size: 14px; margin-top: 8px; opacity: 0.9; color: var(--level-green); font-weight: 700;">
+          ✨ Terima kasih sudah memberi rating!</div>
       </div>
-      <div id="rating-summary" style="font-size: 13px; opacity: 0.55; min-height: 18px;">Memuat rating...</div>
-      <div id="rating-thankyou" style="display:none; font-size: 14px; margin-top: 8px; opacity: 0.8;">✨ Terima kasih sudah memberi rating!</div>
     </div>
-  </div> <!-- Closes #rating-section -->
 
-  <script>
-  (function() {
-    const STORAGE_KEY = 'weavewords-ratings-v1';
-    const USER_KEY = 'weavewords-user-rated';
-    const stars = document.querySelectorAll('.rating-star');
-    let userRated = localStorage.getItem(USER_KEY);
-    let hovered = 0;
+    <script>
+      (function () {
+        const STORAGE_KEY = 'weavewords-ratings-v1';
+        const USER_KEY = 'weavewords-user-rated';
+        const stars = document.querySelectorAll('.rating-star');
+        let userRated = localStorage.getItem(USER_KEY);
+        let hovered = 0;
 
-    function renderStars(active, isHover) {
-      stars.forEach(s => {
-        const v = parseInt(s.dataset.val);
-        s.textContent = v <= active ? '★' : '☆';
-        s.style.color = v <= active ? '#f5c518' : 'inherit';
-        s.style.transform = (isHover && v === active) ? 'scale(1.3)' : 'scale(1)';
-      });
-    }
-
-    async function loadSummary() {
-      try {
-        const res = await window.storage?.get(STORAGE_KEY, true);
-        const data = res ? JSON.parse(res.value) : { total: 0, count: 0 };
-        const avg = data.count > 0 ? (data.total / data.count).toFixed(1) : null;
-        const el = document.getElementById('rating-summary');
-        if (avg) {
-          el.textContent = `⭐ ${avg} / 5 — dari ${data.count} penilaian`;
-        } else {
-          el.textContent = 'Belum ada rating. Jadilah yang pertama!';
+        function renderStars(active, isHover) {
+          stars.forEach(s => {
+            const v = parseInt(s.dataset.val);
+            s.textContent = v <= active ? '★' : '☆';
+            s.style.color = v <= active ? '#f5c518' : 'inherit';
+            s.style.transform = (isHover && v === active) ? 'scale(1.3)' : 'scale(1)';
+          });
         }
-      } catch(e) {
-        document.getElementById('rating-summary').textContent = '';
-      }
-    }
 
-    async function submitRating(val) {
-      try {
-        const res = await window.storage?.get(STORAGE_KEY, true);
-        const data = res ? JSON.parse(res.value) : { total: 0, count: 0 };
-        data.total += val;
-        data.count += 1;
-        await window.storage?.set(STORAGE_KEY, JSON.stringify(data), true);
-        localStorage.setItem(USER_KEY, val);
-        userRated = val;
-        renderStars(val, false);
-        document.getElementById('rating-thankyou').style.display = 'block';
-        document.getElementById('rating-stars').style.pointerEvents = 'none';
+        async function loadSummary() {
+          try {
+            const res = await window.storage?.get(STORAGE_KEY, true);
+            const data = res ? JSON.parse(res.value) : { total: 0, count: 0 };
+            const avg = data.count > 0 ? (data.total / data.count).toFixed(1) : null;
+            const el = document.getElementById('rating-summary');
+            if (el) {
+              if (avg) {
+                el.textContent = currentLang === 'id' ? `⭐ ${avg} / 5 — dari ${data.count} penilaian` : `⭐ ${avg} / 5 — from ${data.count} ratings`;
+              } else {
+                el.textContent = currentLang === 'id' ? 'Belum ada rating. Jadilah yang pertama!' : 'No ratings yet. Be the first!';
+              }
+            }
+          } catch (e) {
+            const el = document.getElementById('rating-summary');
+            if (el) el.textContent = '';
+          }
+        }
+
+        async function submitRating(val) {
+          try {
+            const res = await window.storage?.get(STORAGE_KEY, true);
+            const data = res ? JSON.parse(res.value) : { total: 0, count: 0 };
+            data.total += val;
+            data.count += 1;
+            await window.storage?.set(STORAGE_KEY, JSON.stringify(data), true);
+            localStorage.setItem(USER_KEY, val);
+            userRated = val;
+            renderStars(val, false);
+            const ty = document.getElementById('rating-thankyou');
+            if (ty) ty.style.display = 'block';
+            const rs = document.getElementById('rating-stars');
+            if (rs) rs.style.pointerEvents = 'none';
+            loadSummary();
+          } catch (e) {
+            console.error('Rating error', e);
+          }
+        }
+
+        if (userRated) {
+          renderStars(parseInt(userRated), false);
+          const rs = document.getElementById('rating-stars');
+          if (rs) rs.style.pointerEvents = 'none';
+          const ty = document.getElementById('rating-thankyou');
+          if (ty) ty.style.display = 'block';
+        }
+
+        stars.forEach(s => {
+          s.addEventListener('mouseenter', () => {
+            if (userRated) return;
+            hovered = parseInt(s.dataset.val);
+            renderStars(hovered, true);
+          });
+          s.addEventListener('mouseleave', () => {
+            if (userRated) return;
+            hovered = 0;
+            renderStars(0, false);
+          });
+          s.addEventListener('click', () => {
+            if (userRated) return;
+            submitRating(parseInt(s.dataset.val));
+          });
+        });
+
+        window._loadRatingSummary = loadSummary;
         loadSummary();
-      } catch(e) {
-        console.error('Rating error', e);
-      }
-    }
+      })();
+    </script>
 
-    if (userRated) {
-      renderStars(parseInt(userRated), false);
-      document.getElementById('rating-stars').style.pointerEvents = 'none';
-      document.getElementById('rating-thankyou').style.display = 'block';
-    }
-
-    stars.forEach(s => {
-      s.addEventListener('mouseenter', () => {
-        if (userRated) return;
-        hovered = parseInt(s.dataset.val);
-        renderStars(hovered, true);
-      });
-      s.addEventListener('mouseleave', () => {
-        if (userRated) return;
-        hovered = 0;
-        renderStars(0, false);
-      });
-      s.addEventListener('click', () => {
-        if (userRated) return;
-        submitRating(parseInt(s.dataset.val));
-      });
-    });
-
-    loadSummary();
-  })();
-  </script>
-
-  </div> <!-- Closes .game-wrapper -->
-  </section> <!-- Closes #section-game -->
-
-  <!-- ================================================
-       SECTION 2: ABOUT
-       ================================================ -->
-  <section id="section-about">
-    <div class="about-inner">
-      <p class="about-eyebrow">Latar Belakang</p>
-      <h2 class="about-title">Mengapa Weave Words Hadir?</h2>
-      <p class="about-body">
-        Dibuat atas keprihatinan terhadap masifnya penggunaan AI yang mengambil alih tugas-tugas kecil — seperti menyusun kalimat. Hal ini berpotensi mengurangi kemampuan verbal-linguistik manusia dan kemandirian dalam merangkai kata. Weave Words hadir sebagai wadah latihan intensif menulis dan mengasah kembali ketajaman kognitif linguistik yang mulai tumpul di era serba-otomatis ini.
-      </p>
-      <div class="about-divider"></div>
-    </div>
-  </section>
-
-  <!-- ================================================
-       SECTION 3: BENEFITS
-       ================================================ -->
-  <section id="section-benefits">
-    <div class="section-heading">
-      <p class="eyebrow">Kenapa Berlatih di Sini?</p>
-      <h2>Manfaat yang Kamu Dapatkan</h2>
-    </div>
-    <div class="benefits-grid">
-      <div class="benefit-card">
-        <div class="benefit-icon">✍️</div>
-        <h3>Menajamkan Kemampuan Menulis Mandiri</h3>
-        <p>Latih dirimu merangkai kalimat tanpa bantuan AI. Kemampuan menulis yang diasah secara mandiri adalah aset kognitif yang tak ternilai.</p>
-      </div>
-      <div class="benefit-card">
-        <div class="benefit-icon">💡</div>
-        <h3>Meningkatkan Kreativitas &amp; Imajinasi</h3>
-        <p>Setiap sesi memaksamu menghubungkan kata-kata acak menjadi narasi yang koheren — mendorong otak untuk berpikir lateral dan kreatif.</p>
-      </div>
-      <div class="benefit-card">
-        <div class="benefit-icon">⚡</div>
-        <h3>Melatih Kecepatan Berpikir Struktur Kalimat</h3>
-        <p>Dengan mode timer, kamu dilatih untuk menyusun kalimat yang logis di bawah tekanan waktu — skill krusial dalam komunikasi nyata.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================================================
-       SECTION 4: CUSTOM WORDS & SHARE
-       ================================================ -->
-  <section id="section-custom">
-    <div class="section-heading">
-      <p class="eyebrow">Personalisasi</p>
-      <h2>Buat & Bagikan Kumpulan Kata Kustom</h2>
-    </div>
-    <div class="custom-words-box">
-      <h3>Generator Kata Kustom</h3>
-      <p class="custom-desc">Masukkan 3–10 kata pilihan kamu (pisahkan dengan spasi), lalu terapkan sebagai kata tantangan baru. Kamu juga bisa membagikan link-nya ke teman!</p>
-      <div class="custom-input-row">
-        <input type="text" class="custom-words-input" id="custom-words-input"
-          placeholder="contoh: senja cahaya harapan jalan sunyi">
-        <button class="btn-custom-apply" onclick="applyCustomWords()">Terapkan</button>
-      </div>
-      <p class="custom-hint" id="custom-hint">3–10 kata, dipisahkan spasi</p>
-      <button class="btn-share-pool" id="btn-share-pool" onclick="shareCustomPool()" style="display:none;">
-        🔗 Bagikan Link Kata Ini
-      </button>
-      <div class="share-url-box" id="share-url-box">
-        <p class="share-url-text" id="share-url-text"></p>
-        <button class="btn-copy-url" onclick="copyShareUrl()">Salin Link</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================================================
-       SECTION 5: FAQ
-       ================================================ -->
-  <section id="section-faq">
-    <div class="section-heading">
-      <p class="eyebrow">Pertanyaan Umum</p>
-      <h2>FAQ</h2>
-    </div>
-    <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-question" onclick="toggleFaq(this)">
-          Bagaimana cara bermain Weave Words?
-          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        <div class="faq-answer"><div class="faq-answer-inner">Pilih level kesulitan (mudah, sedang, sulit), lalu gunakan semua kata yang ditampilkan dalam satu paragraf yang koheren. Klik "Nilai tulisanku" untuk mendapat penilaian dari AI.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question" onclick="toggleFaq(this)">
-          Apa yang dinilai oleh AI?
-          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        <div class="faq-answer"><div class="faq-answer-inner">AI menilai 4 aspek: Koherensi (kepaduan antar kalimat), Kebahasaan (tata bahasa & EYD), Kreativitas (orisinalitas ide), dan Penggunaan Kata (ketepatan makna kata dalam konteks).</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question" onclick="toggleFaq(this)">
-          Apakah saya harus login untuk bermain?
-          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        <div class="faq-answer"><div class="faq-answer-inner">Tidak! Weave Words sepenuhnya bisa dimainkan tanpa akun. Cukup buka halaman ini dan langsung bermain. Rating dan progresmu tersimpan di browser lokal.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question" onclick="toggleFaq(this)">
-          Bagaimana cara berbagi tantangan kata ke teman?
-          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        <div class="faq-answer"><div class="faq-answer-inner">Pergi ke bagian "Buat & Bagikan Kata Kustom", masukkan kata-katamu, klik "Terapkan", lalu klik "Bagikan Link Kata Ini". Salin URL unik yang muncul dan kirimkan ke temanmu — mereka langsung bisa bermain dengan kata yang sama!</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question" onclick="toggleFaq(this)">
-          Apakah ada perbedaan level kesulitan?
-          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        <div class="faq-answer"><div class="faq-answer-inner">Ya. Level "Mudah" memberikan kata-kata yang umum dan mudah dirangkai. Level "Sedang" menggunakan kata dengan makna yang lebih beragam. Level "Sulit" menggabungkan kata-kata tidak lazim yang membutuhkan kreativitas tinggi.</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================================================
-       SECTION 6: FEEDBACK FORM (Firebase)
-       ================================================ -->
-  <section id="section-feedback">
-    <div class="section-heading">
-      <p class="eyebrow">Suaramu Penting</p>
-      <h2>Kirim Saran & Masukan</h2>
-    </div>
-    <div class="feedback-form-box">
-      <div class="feedback-field">
-        <label for="fb-name">Nama</label>
-        <input type="text" id="fb-name" placeholder="Nama kamu" autocomplete="name">
-      </div>
-      <div class="feedback-field">
-        <label for="fb-email">Email (opsional)</label>
-        <input type="email" id="fb-email" placeholder="email@contoh.com" autocomplete="email">
-      </div>
-      <div class="feedback-field">
-        <label for="fb-message">Pesan / Saran</label>
-        <textarea id="fb-message" placeholder="Ceritakan pengalamanmu atau sampaikan saran untuk perbaikan..."></textarea>
-      </div>
-      <button class="btn-submit-feedback" id="btn-submit-feedback" onclick="submitFeedback()">
-        Kirim Masukan ✉️
-      </button>
-      <div class="feedback-success" id="feedback-success">
-        ✅ Terima kasih! Masukanmu sudah kami terima dan akan sangat membantu.
-      </div>
-    </div>
-  </section>
-
-  <!-- ================================================
+    <!-- ================================================
        FOOTER
        ================================================ -->
-  <footer class="site-footer">
-    <p>© 2025 <strong>Weave Words</strong> — Asah Kata, Asah Diri.</p>
-  </footer>
+    <footer class="site-footer">
+      <p id="text-footer">© 2025 <strong>Weave Words</strong> — Asah Kata, Asah Diri.</p>
+    </footer>
 
   </div> <!-- Closes .landing-page -->
 
   <div class="share-card-container" id="share-card">
     <!-- Title "Paragraph of the day is..." -->
     <div class="share-card-title" id="share-card-title-text">Paragraph of the day is...</div>
-    
+
     <!-- Opening Quote SVG -->
     <svg class="share-quote opening" viewBox="0 0 16 16" fill="#9db1f6">
       <rect x="2" y="1" width="3" height="3" />
       <rect x="1" y="4" width="3" height="3" />
       <rect x="0" y="7" width="3" height="4" />
       <rect x="1" y="11" width="2" height="2" />
-      
+
       <rect x="8" y="1" width="3" height="3" />
       <rect x="7" y="4" width="3" height="3" />
       <rect x="6" y="7" width="3" height="4" />
@@ -3099,7 +3716,7 @@
       <rect x="1" y="4" width="3" height="3" />
       <rect x="0" y="7" width="3" height="4" />
       <rect x="1" y="11" width="2" height="2" />
-      
+
       <rect x="8" y="1" width="3" height="3" />
       <rect x="7" y="4" width="3" height="3" />
       <rect x="6" y="7" width="3" height="4" />
@@ -3107,7 +3724,7 @@
     </svg>
 
     <!-- Bottom Left Logo -->
-    <img src="/static/logo.png" class="share-logo" alt="Weave Words Logo">
+    <img src="/static/logo.png" class="share-logo" id="share-logo" alt="Weave Words Logo">
 
     <!-- Bottom Right Chips -->
     <div class="share-chips-container" id="share-chips">
@@ -3155,7 +3772,8 @@
     let timeMode = localStorage.getItem('timeMode') || 'none';
     let timerDuration = parseInt(localStorage.getItem('timerDuration')) || 120;
 
-    let minParagraphs = parseInt(localStorage.getItem('minParagraphs')) || 1;
+    let minParagraphs = localStorage.getItem('minParagraphs') !== null ? parseInt(localStorage.getItem('minParagraphs')) : 1;
+    if (isNaN(minParagraphs)) minParagraphs = 1;
     let minWords = parseInt(localStorage.getItem('minWords')) || 0;
     let selectedTheme = localStorage.getItem('selectedTheme') || 'bebas';
 
@@ -3223,6 +3841,8 @@
         settingsLabelMinWords: "Minimal Kata:",
         settingsLabelWritingTheme: "Tema Tulisan:",
         optionParagraphs: "Paragraf",
+        optionNoMinParagraphs: "Tanpa Minimal Paragraf",
+        badgeNoMinParagraphs: "Bebas Paragraf",
         themeBebas: "Bebas",
         themeFilosofis: "Filosofis",
         themeKomedi: "Komedi",
@@ -3270,7 +3890,46 @@
           <div class="tutorial-goal-box">
             <strong>Tujuan permainan:</strong> menyusun paragraf yang kreatif, koheren, dan mampu mengintegrasikan seluruh kata yang diberikan dengan baik.
           </div>
-        `
+        `,
+        navBermain: "Bermain",
+        navTentang: "Tentang",
+        navManfaat: "Manfaat",
+        navFAQ: "FAQ",
+        navSaran: "Saran",
+        aboutEyebrow: "Latar Belakang",
+        aboutTitle: "Mengapa Weave Words Hadir?",
+        aboutBody: "Dibuat atas keprihatinan terhadap masifnya penggunaan AI yang mengambil alih tugas-tugas kecil — seperti menyusun kalimat. Hal ini berpotensi mengurangi kemampuan verbal-linguistik manusia dan kemandirian dalam merangkai kata. Weave Words hadir sebagai wadah latihan intensif menulis dan mengasah kembali ketajaman kognitif linguistik yang mulai tumpul di era serba-otomatis ini.",
+        benefitsEyebrow: "Kenapa Berlatih di Sini?",
+        benefitsTitle: "Manfaat yang Kamu Dapatkan",
+        benefit1Title: "Menajamkan Kemampuan Menulis Mandiri",
+        benefit1Desc: "Latih dirimu merangkai kalimat tanpa bantuan AI. Kemampuan menulis yang diasah secara mandiri adalah aset kognitif yang tak ternilai.",
+        benefit2Title: "Meningkatkan Kreativitas & Imajinasi",
+        benefit2Desc: "Setiap sesi memaksamu menghubungkan kata-kata acak menjadi narasi yang koheren — mendorong otak untuk berpikir lateral dan kreatif.",
+        benefit3Title: "Melatih Kecepatan Berpikir Struktur Kalimat",
+        benefit3Desc: "Dengan mode timer, kamu dilatih untuk menyusun kalimat yang logis di bawah tekanan waktu — skill krusial dalam komunikasi nyata.",
+        faqEyebrow: "Pertanyaan Umum",
+        faqTitle: "FAQ",
+        faqQ1: "Bagaimana cara bermain Weave Words?",
+        faqA1: "Pilih level kesulitan (mudah, sedang, sulit), lalu gunakan semua kata yang ditampilkan dalam satu paragraf yang koheren. Klik \"Nilai tulisanku\" untuk mendapat penilaian dari AI.",
+        faqQ2: "Apa yang dinilai oleh AI?",
+        faqA2: "AI menilai 4 aspek: Koherensi (kepaduan antar kalimat), Kebahasaan (tata bahasa & EYD), Kreativitas (orisinalitas ide), dan Penggunaan Kata (ketepatan makna kata dalam konteks).",
+        faqQ3: "Apakah saya harus login untuk bermain?",
+        faqA3: "Tidak! Weave Words sepenuhnya bisa dimainkan tanpa akun. Cukup buka halaman ini dan langsung bermain. Rating dan progresmu tersimpan di browser lokal.",
+        faqQ4: "Bagaimana cara berbagi tantangan kata ke teman?",
+        faqA4: "Klik tombol \"Custom ⚙️\" di sebelah \"Ganti Kata\", masukkan kata-kata pilihanmu, lalu klik \"Bagikan Link Kata\". Kirim URL yang dihasilkan ke temanmu agar mereka langsung bisa bermain dengan kata yang sama!",
+        faqQ5: "Apakah ada perbedaan level kesulitan?",
+        faqA5: "Ya. Level \"Mudah\" memberikan kata-kata yang umum dan mudah dirangkai. Level \"Sedang\" menggunakan kata dengan makna yang lebih beragam. Level \"Sulit\" menggabungkan kata-kata tidak lazim yang membutuhkan kreativitas tinggi.",
+        feedbackEyebrow: "Suaramu Penting",
+        feedbackTitle: "Kirim Saran & Masukan",
+        fbLabelName: "Nama",
+        fbPlaceholderName: "Nama kamu",
+        fbLabelEmail: "Email (opsional)",
+        fbPlaceholderEmail: "email@contoh.com",
+        fbLabelMessage: "Pesan / Saran",
+        fbPlaceholderMessage: "Ceritakan pengalamanmu atau sampaikan saran untuk perbaikan...",
+        fbSubmitBtn: "Kirim Masukan ✉️",
+        fbSuccessMsg: "✅ Terima kasih! Masukanmu sudah kami terima dan akan sangat membantu.",
+        footerText: "© 2025 <strong>Weave Words</strong> — Asah Kata, Asah Diri."
       },
       en: {
         mudah: "easy",
@@ -3304,6 +3963,8 @@
         settingsLabelMinWords: "Minimum Words:",
         settingsLabelWritingTheme: "Writing Theme:",
         optionParagraphs: "Paragraph(s)",
+        optionNoMinParagraphs: "No Minimum Paragraphs",
+        badgeNoMinParagraphs: "No Min. Paragraphs",
         themeBebas: "Free Theme",
         themeFilosofis: "Philosophical",
         themeKomedi: "Comedy",
@@ -3370,7 +4031,46 @@
           <div class="tutorial-goal-box">
             <strong>Game goal:</strong> compose a paragraph that is creative, coherent, and integrates all provided words beautifully.
           </div>
-        `
+        `,
+        navBermain: "Play",
+        navTentang: "About",
+        navManfaat: "Benefits",
+        navFAQ: "FAQ",
+        navSaran: "Feedback",
+        aboutEyebrow: "Background",
+        aboutTitle: "Why Weave Words?",
+        aboutBody: "Created out of concern over the massive use of AI taking over small tasks — such as constructing sentences. This potentially reduces human verbal-linguistic abilities and independence in weaving words. Weave Words is here as a platform for intensive writing practice and to sharpen linguistic cognitive skills that are starting to dull in this automated era.",
+        benefitsEyebrow: "Why Practice Here?",
+        benefitsTitle: "Benefits You Get",
+        benefit1Title: "Sharpen Independent Writing Skills",
+        benefit1Desc: "Train yourself to weave sentences without AI assistance. Writing skills honed independently are invaluable cognitive assets.",
+        benefit2Title: "Boost Creativity & Imagination",
+        benefit2Desc: "Each session forces you to connect random words into a coherent narrative — pushing the brain to think laterally and creatively.",
+        benefit3Title: "Train Sentence Structure Speed",
+        benefit3Desc: "With timer mode, you are trained to construct logical sentences under time pressure — a crucial skill in real-life communication.",
+        faqEyebrow: "Common Questions",
+        faqTitle: "FAQ",
+        faqQ1: "How do I play Weave Words?",
+        faqA1: "Choose a difficulty level (easy, medium, hard), then use all the displayed words in a single coherent paragraph. Click \"Grade my writing\" to get an AI evaluation.",
+        faqQ2: "What does the AI evaluate?",
+        faqA2: "The AI evaluates 4 aspects: Coherence (flow between sentences), Language/Grammar (grammar and spelling rules), Creativity (originality of ideas), and Word Usage (accurate contextual meaning of the words).",
+        faqQ3: "Do I need to log in to play?",
+        faqA3: "No! Weave Words is fully playable without an account. Simply open this page and start playing. Your rating and progress are saved in your local browser.",
+        faqQ4: "How do I share a word challenge with friends?",
+        faqA4: "Click the \"Custom ⚙️\" button next to \"Change Words\", enter your chosen words, and click \"Share Words Link\". Send the generated URL to your friends so they can play with the exact same words!",
+        faqQ5: "Is there a difference in difficulty levels?",
+        faqA5: "Yes. The \"Easy\" level provides common words that are simple to connect. The \"Medium\" level uses words with more diverse meanings. The \"Hard\" level combines unusual words that require high creativity.",
+        feedbackEyebrow: "Your Voice Matters",
+        feedbackTitle: "Send Feedback & Suggestions",
+        fbLabelName: "Name",
+        fbPlaceholderName: "Your name",
+        fbLabelEmail: "Email (optional)",
+        fbPlaceholderEmail: "email@example.com",
+        fbLabelMessage: "Message / Suggestion",
+        fbPlaceholderMessage: "Tell us about your experience or share suggestions for improvement...",
+        fbSubmitBtn: "Send Feedback ✉️",
+        fbSuccessMsg: "✅ Thank you! Your feedback has been received and is highly appreciated.",
+        footerText: "© 2025 <strong>Weave Words</strong> — Sharpen Your Words, Sharpen Yourself."
       }
     };
 
@@ -3394,7 +4094,11 @@
 
       const paraBadge = document.getElementById('badge-min-paragraphs');
       if (paraBadge) {
-        paraBadge.textContent = `${texts.badgeMinParagraphsPrefix || 'Min. Paragraf:'} ${minParagraphs}`;
+        if (minParagraphs === 0) {
+          paraBadge.textContent = texts.badgeNoMinParagraphs || 'Bebas Paragraf';
+        } else {
+          paraBadge.textContent = `${texts.badgeMinParagraphsPrefix || 'Min. Paragraf:'} ${minParagraphs}`;
+        }
       }
 
       const wordsBadge = document.getElementById('badge-min-words');
@@ -3414,7 +4118,6 @@
       // Update UI elements
       document.getElementById('label-level').textContent = texts.labelLevel;
       document.getElementById('label-words').textContent = texts.labelWords;
-      document.getElementById('text-change-words').textContent = texts.textChangeWords;
       document.getElementById('label-essay').textContent = texts.labelEssay;
       document.getElementById('essay-input').placeholder = texts.essayPlaceholder;
       document.getElementById('btn-submit').innerHTML = texts.btnSubmit;
@@ -3500,7 +4203,11 @@
       const minPSelect = document.getElementById('settings-select-minparagraphs');
       if (minPSelect) {
         Array.from(minPSelect.options).forEach(opt => {
-          opt.textContent = `${opt.value} ${texts.optionParagraphs}`;
+          if (opt.value === '0') {
+            opt.textContent = texts.optionNoMinParagraphs || 'Tanpa Minimal';
+          } else {
+            opt.textContent = `${opt.value} ${texts.optionParagraphs}`;
+          }
         });
       }
 
@@ -3524,21 +4231,203 @@
       if (sedangBtn) sedangBtn.textContent = texts.sedang;
       if (sulitBtn) sulitBtn.textContent = texts.sulit;
 
+      const customTitle = document.getElementById('text-custom-title');
+      if (customTitle) {
+        customTitle.textContent = currentLang === 'id' ? 'Tantangan Kata Kustom' : 'Custom Word Challenge';
+      }
+      const customPlay = document.getElementById('text-custom-play');
+      if (customPlay) {
+        customPlay.textContent = currentLang === 'id' ? 'Mainkan Kata Ini' : 'Play These Words';
+      }
+      const customShare = document.getElementById('text-custom-share');
+      if (customShare) {
+        customShare.textContent = currentLang === 'id' ? 'Bagikan Link Kata' : 'Share Words Link';
+      }
+      const shareVarBtn = document.getElementById('text-share-variation');
+      if (shareVarBtn) {
+        shareVarBtn.textContent = currentLang === 'id' ? 'Bagikan Variasi' : 'Share Variation';
+      }
+      const ratingTitle = document.getElementById('rating-title-text');
+      if (ratingTitle) {
+        ratingTitle.textContent = currentLang === 'id' ? 'Beri Rating Game Ini' : 'Rate this game';
+      }
+      const ratingThankYou = document.getElementById('rating-thankyou');
+      if (ratingThankYou) {
+        ratingThankYou.textContent = currentLang === 'id' ? '✨ Terima kasih atas rating Anda!' : '✨ Thank you for your rating!';
+      }
+
+      // Update custom chips input translations
+      updateCustomChipsUI();
+
       // Update flag & initials in header button
       const flagMap = { id: 'https://flagcdn.com/w20/id.png', en: 'https://flagcdn.com/w20/gb.png' };
       document.getElementById('current-lang-flag').src = flagMap[currentLang];
       document.getElementById('current-lang-text').textContent = currentLang.toUpperCase();
+
+      // Translate additional lower sections (About, Benefits, FAQ, Feedback, Footer)
+      const navLinkGame = document.getElementById('nav-link-game');
+      const navLinkAbout = document.getElementById('nav-link-about');
+      const navLinkBenefits = document.getElementById('nav-link-benefits');
+      const navLinkFaq = document.getElementById('nav-link-faq');
+      const navLinkFeedback = document.getElementById('nav-link-feedback');
+
+      if (navLinkGame) navLinkGame.textContent = texts.navBermain;
+      if (navLinkAbout) navLinkAbout.textContent = texts.navTentang;
+      if (navLinkBenefits) navLinkBenefits.textContent = texts.navManfaat;
+      if (navLinkFaq) navLinkFaq.textContent = texts.navFAQ;
+      if (navLinkFeedback) navLinkFeedback.textContent = texts.navSaran;
+
+      const aboutEyebrow = document.getElementById('text-about-eyebrow');
+      const aboutTitle = document.getElementById('text-about-title');
+      const aboutBody = document.getElementById('text-about-body');
+
+      if (aboutEyebrow) aboutEyebrow.textContent = texts.aboutEyebrow;
+      if (aboutTitle) aboutTitle.textContent = texts.aboutTitle;
+      if (aboutBody) aboutBody.textContent = texts.aboutBody;
+
+      const benefitsEyebrow = document.getElementById('text-benefits-eyebrow');
+      const benefitsTitle = document.getElementById('text-benefits-title');
+      const b1Title = document.getElementById('text-benefit1-title');
+      const b1Desc = document.getElementById('text-benefit1-desc');
+      const b2Title = document.getElementById('text-benefit2-title');
+      const b2Desc = document.getElementById('text-benefit2-desc');
+      const b3Title = document.getElementById('text-benefit3-title');
+      const b3Desc = document.getElementById('text-benefit3-desc');
+
+      if (benefitsEyebrow) benefitsEyebrow.textContent = texts.benefitsEyebrow;
+      if (benefitsTitle) benefitsTitle.textContent = texts.benefitsTitle;
+      if (b1Title) b1Title.textContent = texts.benefit1Title;
+      if (b1Desc) b1Desc.textContent = texts.benefit1Desc;
+      if (b2Title) b2Title.textContent = texts.benefit2Title;
+      if (b2Desc) b2Desc.textContent = texts.benefit2Desc;
+      if (b3Title) b3Title.textContent = texts.benefit3Title;
+      if (b3Desc) b3Desc.textContent = texts.benefit3Desc;
+
+      const faqEyebrow = document.getElementById('text-faq-eyebrow');
+      const faqTitle = document.getElementById('text-faq-title');
+      const faqQ1 = document.getElementById('text-faq-q1');
+      const faqA1 = document.getElementById('text-faq-a1');
+      const faqQ2 = document.getElementById('text-faq-q2');
+      const faqA2 = document.getElementById('text-faq-a2');
+      const faqQ3 = document.getElementById('text-faq-q3');
+      const faqA3 = document.getElementById('text-faq-a3');
+      const faqQ4 = document.getElementById('text-faq-q4');
+      const faqA4 = document.getElementById('text-faq-a4');
+      const faqQ5 = document.getElementById('text-faq-q5');
+      const faqA5 = document.getElementById('text-faq-a5');
+
+      if (faqEyebrow) faqEyebrow.textContent = texts.faqEyebrow;
+      if (faqTitle) faqTitle.textContent = texts.faqTitle;
+      if (faqQ1) faqQ1.textContent = texts.faqQ1;
+      if (faqA1) faqA1.textContent = texts.faqA1;
+      if (faqQ2) faqQ2.textContent = texts.faqQ2;
+      if (faqA2) faqA2.textContent = texts.faqA2;
+      if (faqQ3) faqQ3.textContent = texts.faqQ3;
+      if (faqA3) faqA3.textContent = texts.faqA3;
+      if (faqQ4) faqQ4.textContent = texts.faqQ4;
+      if (faqA4) faqA4.textContent = texts.faqA4;
+      if (faqQ5) faqQ5.textContent = texts.faqQ5;
+      if (faqA5) faqA5.textContent = texts.faqA5;
+
+      const feedbackEyebrow = document.getElementById('text-feedback-eyebrow');
+      const feedbackTitle = document.getElementById('text-feedback-title');
+      const fbLabelName = document.getElementById('text-fb-label-name');
+      const fbNameInput = document.getElementById('fb-name');
+      const fbLabelEmail = document.getElementById('text-fb-label-email');
+      const fbEmailInput = document.getElementById('fb-email');
+      const fbLabelMsg = document.getElementById('text-fb-label-message');
+      const fbMsgInput = document.getElementById('fb-message');
+      const fbSubmit = document.getElementById('btn-submit-feedback');
+      const fbSuccess = document.getElementById('feedback-success');
+
+      if (feedbackEyebrow) feedbackEyebrow.textContent = texts.feedbackEyebrow;
+      if (feedbackTitle) feedbackTitle.textContent = texts.feedbackTitle;
+      if (fbLabelName) fbLabelName.textContent = texts.fbLabelName;
+      if (fbNameInput) fbNameInput.placeholder = texts.fbPlaceholderName;
+      if (fbLabelEmail) fbLabelEmail.textContent = texts.fbLabelEmail;
+      if (fbEmailInput) fbEmailInput.placeholder = texts.fbPlaceholderEmail;
+      if (fbLabelMsg) fbLabelMsg.textContent = texts.fbLabelMessage;
+      if (fbMsgInput) fbMsgInput.placeholder = texts.fbPlaceholderMessage;
+      if (fbSubmit) fbSubmit.textContent = texts.fbSubmitBtn;
+      if (fbSuccess) fbSuccess.textContent = texts.fbSuccessMsg;
+
+      const footerText = document.getElementById('text-footer');
+      if (footerText) footerText.innerHTML = texts.footerText;
+
+      // Update words dropdown translations
+      const menuCustom = document.getElementById('text-menu-custom');
+      if (menuCustom) menuCustom.textContent = currentLang === 'id' ? 'Custom' : 'Custom';
+
+      const menuShare = document.getElementById('text-menu-share');
+      if (menuShare) menuShare.textContent = currentLang === 'id' ? 'Bagikan Variasi' : 'Share Variation';
+
+      const menuReload = document.getElementById('text-menu-reload');
+      if (menuReload) menuReload.textContent = currentLang === 'id' ? 'Ganti Kata' : 'Reload Words';
+
+      const wordsMenuBtn = document.getElementById('words-menu-btn');
+      if (wordsMenuBtn) wordsMenuBtn.title = currentLang === 'id' ? 'Menu Kata' : 'Words Menu';
+
+      // Re-trigger rating summary translation load
+      if (typeof window._loadRatingSummary === 'function') {
+        window._loadRatingSummary();
+      }
     }
 
     function updateLogo() {
-      const logoImg = document.getElementById('app-logo');
-      if (logoImg) {
-        logoImg.src = darkMode ? '/static/logo-dark.png' : '/static/logo.png';
+      const navLogo = document.getElementById('nav-logo');
+      if (navLogo) {
+        navLogo.src = darkMode ? '/static/logo-dark.png' : '/static/logo.png';
+      }
+      const ratingLogo = document.getElementById('rating-logo');
+      if (ratingLogo) {
+        ratingLogo.src = darkMode ? '/static/logo-dark.png' : '/static/logo.png';
+      }
+      const shareLogo = document.getElementById('share-logo');
+      if (shareLogo) {
+        shareLogo.src = darkMode ? '/static/logo-dark.png' : '/static/logo.png';
       }
       const welcomeLogo = document.querySelector('.welcome-logo');
       if (welcomeLogo) {
         welcomeLogo.src = '/static/logo.png';
       }
+    }
+
+    function toggleWordsMenu(event) {
+      event.stopPropagation();
+      const dropdown = document.getElementById('words-dropdown');
+      if (!dropdown) return;
+      const isVisible = dropdown.style.display === 'flex';
+
+      // Close lang dropdown
+      const langDropdown = document.getElementById('lang-dropdown');
+      if (langDropdown) langDropdown.classList.remove('show');
+
+      dropdown.style.display = isVisible ? 'none' : 'flex';
+    }
+
+    function closeWordsMenu() {
+      const dropdown = document.getElementById('words-dropdown');
+      if (dropdown) {
+        dropdown.style.display = 'none';
+      }
+    }
+
+    function triggerMenuCustom(event) {
+      event.stopPropagation();
+      closeWordsMenu();
+      toggleCustomWordsSection();
+    }
+
+    function triggerMenuShare(event) {
+      event.stopPropagation();
+      closeWordsMenu();
+      shareCurrentVariation();
+    }
+
+    function triggerMenuReload(event) {
+      event.stopPropagation();
+      closeWordsMenu();
+      fetchNewWords();
     }
 
     function toggleDarkMode() {
@@ -3555,6 +4444,101 @@
     function toggleLangDropdown(event) {
       event.stopPropagation();
       document.getElementById('lang-dropdown').classList.toggle('show');
+    }
+
+    function toggleNavMenu(event) {
+      if (event) event.stopPropagation();
+      const toggle = document.getElementById('nav-toggle');
+      const links = document.getElementById('nav-links');
+      if (toggle && links) {
+        toggle.classList.toggle('active');
+        links.classList.toggle('active');
+      }
+    }
+
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const answer = item.querySelector('.faq-answer');
+      if (!item || !answer) return;
+      const isOpen = item.classList.contains('open');
+
+      // Close all other FAQ items
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.classList.remove('open');
+        const ans = el.querySelector('.faq-answer');
+        if (ans) ans.style.maxHeight = null;
+      });
+
+      if (!isOpen) {
+        item.classList.add('open');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+      }
+    }
+
+    function toggleCustomWordsSection() {
+      const container = document.querySelector('.custom-words-container');
+      const btn = document.getElementById('btn-custom-toggle');
+      if (container) {
+        if (container.style.display === 'none' || !container.style.display) {
+          container.style.display = 'block';
+          if (btn) btn.classList.add('active');
+        } else {
+          container.style.display = 'none';
+          if (btn) btn.classList.remove('active');
+        }
+      }
+    }
+
+    async function submitFeedback() {
+      const nameEl = document.getElementById('fb-name');
+      const emailEl = document.getElementById('fb-email');
+      const messageEl = document.getElementById('fb-message');
+      const submitBtn = document.getElementById('btn-submit-feedback');
+      const successEl = document.getElementById('feedback-success');
+
+      if (!messageEl || !messageEl.value.trim()) {
+        alert(currentLang === 'id' ? 'Silakan isi pesan/saran Anda!' : 'Please enter your message/feedback!');
+        return;
+      }
+
+      const name = nameEl ? nameEl.value.trim() : '';
+      const email = emailEl ? emailEl.value.trim() : '';
+      const message = messageEl.value.trim();
+
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        if (window._firebaseDb && window._firebaseCollection && window._firebaseAddDoc) {
+          await window._firebaseAddDoc(
+            window._firebaseCollection(window._firebaseDb, "feedbacks"),
+            {
+              name: name,
+              email: email,
+              message: message,
+              timestamp: window._firebaseServerTimestamp ? window._firebaseServerTimestamp() : new Date()
+            }
+          );
+        } else {
+          console.warn("Firebase not loaded, simulating submission");
+        }
+
+        if (successEl) {
+          successEl.classList.add('show');
+          setTimeout(() => {
+            successEl.classList.remove('show');
+          }, 5000);
+        }
+
+        if (nameEl) nameEl.value = '';
+        if (emailEl) emailEl.value = '';
+        if (messageEl) messageEl.value = '';
+
+      } catch (err) {
+        console.error("Error submitting feedback:", err);
+        alert(currentLang === 'id' ? 'Gagal mengirim saran. Coba lagi.' : 'Failed to send feedback. Please try again.');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
     }
 
     function changeLanguage(lang) {
@@ -3649,6 +4633,9 @@
     window.addEventListener('click', () => {
       const dropdown = document.getElementById('lang-dropdown');
       if (dropdown) dropdown.classList.remove('show');
+
+      const wordsDropdown = document.getElementById('words-dropdown');
+      if (wordsDropdown) wordsDropdown.style.display = 'none';
     });
 
     function saveSettings() {
@@ -3669,8 +4656,8 @@
       localStorage.setItem('timerDuration', tempTimerDuration);
       timerDuration = tempTimerDuration;
 
-      // Save Min Paragraphs
-      minParagraphs = parseInt(document.getElementById('settings-select-minparagraphs').value) || 1;
+      minParagraphs = parseInt(document.getElementById('settings-select-minparagraphs').value);
+      if (isNaN(minParagraphs)) minParagraphs = 1;
       localStorage.setItem('minParagraphs', minParagraphs);
 
       // Save Min Words
@@ -3690,24 +4677,103 @@
 
     // Initialize game on load
     window.addEventListener('DOMContentLoaded', () => {
-      // Reset all game settings to default on reload
-      targetWordCount = 6;
-      timeMode = 'none';
-      timerDuration = 120;
-      minParagraphs = 1;
-      minWords = 0;
-      selectedTheme = 'bebas';
+      // Force scroll to top on page reload
+      if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
+      }
+      window.scrollTo(0, 0);
 
-      localStorage.setItem('wordCount', targetWordCount);
-      localStorage.setItem('timeMode', timeMode);
-      localStorage.setItem('timerDuration', timerDuration);
-      localStorage.setItem('minParagraphs', minParagraphs);
-      localStorage.setItem('minWords', minWords);
-      localStorage.setItem('selectedTheme', selectedTheme);
+      // Check URL parameters first
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlWords = urlParams.get('words');
+      const urlLang = urlParams.get('lang');
+      const urlTheme = urlParams.get('theme');
+      const urlParagraphs = urlParams.get('paragraphs');
+      const urlMinWords = urlParams.get('minwords');
+
+      // Apply settings from URL if present
+      if (urlLang) {
+        currentLang = urlLang;
+        localStorage.setItem('lang', currentLang);
+      }
+      if (urlTheme) {
+        selectedTheme = urlTheme;
+        localStorage.setItem('selectedTheme', selectedTheme);
+      }
+      if (urlParagraphs) {
+        minParagraphs = parseInt(urlParagraphs);
+        if (isNaN(minParagraphs)) minParagraphs = 1;
+        localStorage.setItem('minParagraphs', minParagraphs);
+      }
+      if (urlMinWords) {
+        minWords = parseInt(urlMinWords) || 0;
+        localStorage.setItem('minWords', minWords);
+      }
 
       updateLogo();
       applyTranslations();
-      selectLevel('mudah');
+
+      if (urlWords) {
+        // Load custom words from shared URL
+        customWords = urlWords.split(',').map(w => w.trim()).filter(Boolean);
+        activeWords = [...customWords];
+        updateCustomChipsUI();
+
+        // Deselect level buttons
+        document.querySelectorAll('.btn-level').forEach(btn => btn.classList.remove('active'));
+
+        renderWords();
+        checkWordUsage();
+        initTimeMode();
+
+        showToast(currentLang === 'id' ? '🎮 Variasi kata berhasil dimuat!' : '🎮 Word variation loaded!');
+      } else {
+        selectLevel(currentLevel || 'mudah');
+      }
+
+      // Setup custom chip input interaction
+      const wrapper = document.getElementById('chip-input-wrapper');
+      const inputField = document.getElementById('custom-input-field');
+      if (wrapper && inputField) {
+        wrapper.addEventListener('click', () => {
+          inputField.focus();
+        });
+
+        inputField.addEventListener('keyup', (e) => {
+          if (e.key === ' ' || e.code === 'Space') {
+            const val = inputField.value.trim();
+            if (val) {
+              addCustomWordChip(val);
+            }
+            inputField.value = '';
+          }
+        });
+
+        inputField.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const val = inputField.value.trim();
+            if (val) {
+              addCustomWordChip(val);
+            }
+            inputField.value = '';
+          } else if (e.key === 'Backspace' && inputField.value === '') {
+            removeLastCustomWordChip();
+          }
+        });
+
+        inputField.addEventListener('input', (e) => {
+          const val = inputField.value;
+          if (val.endsWith(' ')) {
+            const text = val.trim();
+            if (text) {
+              const words = text.split(/\s+/).filter(Boolean);
+              words.forEach(w => addCustomWordChip(w));
+            }
+            inputField.value = '';
+          }
+        });
+      }
 
       // Paste blocker
       const essayInput = document.getElementById('essay-input');
@@ -3726,6 +4792,44 @@
           }
         });
       }
+
+      // Intercept navigation links for smooth scrolling with offset
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', (e) => {
+          const targetId = link.getAttribute('href');
+          if (targetId && targetId.startsWith('#')) {
+            e.preventDefault();
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) {
+              const navbarHeight = 56;
+              const targetPosition = targetEl.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+              window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+              });
+            }
+          }
+          // Close mobile menu if open
+          const toggleBtn = document.getElementById('nav-toggle');
+          const navLinks = document.getElementById('nav-links');
+          if (toggleBtn && navLinks) {
+            toggleBtn.classList.remove('active');
+            navLinks.classList.remove('active');
+          }
+        });
+      });
+
+      // Close nav menu on clicking outside
+      document.addEventListener('click', (e) => {
+        const toggleBtn = document.getElementById('nav-toggle');
+        const navLinks = document.getElementById('nav-links');
+        if (toggleBtn && navLinks && navLinks.classList.contains('active')) {
+          if (!toggleBtn.contains(e.target) && !navLinks.contains(e.target)) {
+            toggleBtn.classList.remove('active');
+            navLinks.classList.remove('active');
+          }
+        }
+      });
     });
 
     // Select level toggles
@@ -3773,15 +4877,157 @@
         });
     }
 
+    const wordDefinitions = {
+      id: {
+        piring: "Wadah bulat pipih untuk menaruh makanan.",
+        sendok: "Alat makan cekung bertangkai.",
+        sepeda: "Kendaraan roda dua bertenaga pedal.",
+        buku: "Lembar kertas berjilid berisi tulisan/gambar.",
+        kucing: "Hewan mamalia karnivora kecil yang lucu.",
+        garpu: "Alat makan bermata tiga atau empat.",
+        rumah: "Bangunan tempat tinggal manusia.",
+        air: "Senyawa cair jernih penunjang kehidupan.",
+        makan: "Mengonsumsi makanan untuk energi.",
+        jalan: "Prasarana transportasi darat.",
+        pohon: "Tumbuhan berkayu keras yang tinggi.",
+        tidur: "Istirahat alami bagi tubuh dan pikiran.",
+        hujan: "Air yang jatuh dari awan di langit.",
+        langit: "Ruang luas di atas bumi.",
+        tangan: "Anggota badan dari pergelangan hingga ujung jari.",
+        suara: "Gelombang bunyi yang dapat didengar.",
+        angin: "Udara yang bergerak akibat perbedaan tekanan.",
+        meja: "Mebel berkaki dengan permukaan datar.",
+        kursi: "Tempat duduk berkaki dan sandaran.",
+        pintu: "Papan penutup lubang masuk/keluar.",
+        lampu: "Alat penerangan buatan.",
+        bunga: "Bagian tumbuhan yang menghasilkan biji.",
+        sungai: "Aliran air alami berukuran besar.",
+        badai: "Angin kencang disertai hujan/petir.",
+        kacamata: "Alat bantu penglihatan berlensa.",
+        lumpur: "Campuran tanah dan air yang becek.",
+        helikopter: "Pesawat terbang berbaling-baling putar.",
+        kamus: "Buku rujukan berisi daftar kata dan maknanya.",
+        cermin: "Kaca bening yang memantulkan bayangan.",
+        gunung: "Bukit yang sangat besar dan tinggi.",
+        anggur: "Buah bulat kecil penghasil minuman/kismis.",
+        perahu: "Kendaraan air kecil untuk menyeberang.",
+        awan: "Kumpulan titik air/es di atmosfer.",
+        mercusuar: "Menara pemandu kapal dengan lampu suar.",
+        teleskop: "Alat optik untuk melihat benda jauh di angkasa.",
+        kawanan: "Sekelompok hewan sejenis yang berkumpul.",
+        labirin: "Sistem jalan berliku-liku yang membingungkan.",
+        kompas: "Alat penunjuk arah mata angin magnetik.",
+        fosil: "Sisa-sisa makhluk hidup kuno yang membatu.",
+        kanvas: "Kain kasar tebal untuk melukis.",
+        entropi: "Derajat ketidakteraturan dalam sistem fisik.",
+        kamuflase: "Metode penyamaran diri agar tidak terlihat.",
+        sinestesia: "Fenomena sensorik di mana satu indra memicu indra lain.",
+        arketipe: "Model asli atau pola dasar suatu konsep.",
+        paradigma: "Kerangka berpikir atau model teoretis.",
+        gerhana: "Fenomena tertutupnya benda langit oleh benda langit lain.",
+        eklektik: "Metode memilih yang terbaik dari berbagai sumber.",
+        resonansi: "Ikut bergetarnya suatu benda karena getaran lain.",
+        absurditas: "Sifat atau keadaan yang konyol/tidak logis.",
+        simbiosis: "Hubungan erat antara dua organisme berbeda.",
+        symbiosis: "Hubungan erat antara dua organisme berbeda.",
+        katarsis: "Pelepasan emosi yang mendalam atau penyucian diri.",
+        euforia: "Perasaan gembira dan bahagia yang berlebihan.",
+        metafizika: "Cabang filsafat tentang hakikat keberadaan.",
+        metafisika: "Cabang filsafat tentang hakikat keberadaan.",
+        nihilisme: "Pandangan bahwa kehidupan tidak memiliki makna objektif.",
+        dialektika: "Metode pencarian kebenaran melalui argumen logis.",
+        epistemologi: "Teori tentang hakikat dan batas pengetahuan.",
+        fenomenologi: "Studi tentang pengalaman sadar dari sudut pandang pertama.",
+        ontologi: "Cabang filsafat tentang hakikat realitas atau eksistensi."
+      },
+      en: {
+        plate: "A flat dish, typically circular, from which food is eaten.",
+        spoon: "An utensil consisting of a small, shallow bowl with a handle.",
+        bicycle: "A vehicle with two wheels, propelled by pedals.",
+        book: "A written or printed work consisting of pages bound together.",
+        cat: "A small domesticated carnivorous mammal.",
+        fork: "A pronged utensil used for lifting and eating food.",
+        house: "A building for human habitation.",
+        water: "A colorless, transparent, odorless liquid essential for life.",
+        eat: "Consume food, typically by chewing and swallowing.",
+        road: "A wide way leading from one place to another.",
+        tree: "A woody perennial plant, typically having a single stem or trunk.",
+        sleep: "A naturally recurring state of mind and body characterized by altered consciousness.",
+        rain: "Moisture condensed from the atmosphere that falls in separate drops.",
+        sky: "The upper atmosphere or expanse of space seen from the earth.",
+        hand: "The terminal part of the human arm, including the palm and fingers.",
+        voice: "The sound produced in a person's larynx and uttered through the mouth.",
+        wind: "The perceptible natural movement of the air.",
+        table: "A piece of furniture with a flat top and one or more legs.",
+        chair: "A separate seat for one person, typically with a back and four legs.",
+        door: "A hinged, sliding, or revolving barrier for closing an entrance.",
+        lamp: "A device for giving light, especially one with a bulb or candle.",
+        flower: "The seed-bearing part of a plant, consisting of reproductive organs.",
+        river: "A large natural stream of water flowing in a channel.",
+        storm: "A violent disturbance of the atmosphere with strong winds and rain.",
+        glasses: "A pair of lenses set in a frame worn to correct vision.",
+        mud: "Soft, wet earth or dirt.",
+        helicopter: "A type of aircraft deriving both lift and thrust from rotor blades.",
+        dictionary: "A book or electronic resource that lists words and their meanings.",
+        mirror: "A reflective surface, typically of glass coated with a metal amalgam.",
+        mountain: "A large natural elevation of the earth's surface rising abruptly.",
+        grapes: "A berry growing in clusters on a grapevine, eaten raw or used to make wine.",
+        boat: "A small vessel for traveling on water.",
+        cloud: "A visible mass of condensed water vapor floating in the atmosphere.",
+        lighthouse: "A tower with a bright light at the top to guide ships.",
+        telescope: "An optical instrument designed to make distant objects appear nearer.",
+        herd: "A large group of animals, especially hoofed mammals, that live together.",
+        maze: "A complex network of paths or passages, designed as a puzzle.",
+        compass: "An instrument containing a magnetized pointer which shows direction.",
+        fossil: "The remains or impression of a prehistoric organism preserved in petrified form.",
+        canvas: "A strong, coarse unbleached cloth used as a surface for oil painting.",
+        entropy: "The measure of disorder or randomness in a system.",
+        camouflage: "Defense mechanism used to blend in with surroundings.",
+        synesthesia: "A sensory phenomenon where stimulation of one pathway leads to experiences in another.",
+        archetype: "A very typical example of a certain person or thing; original model.",
+        paradigm: "A typical pattern or model of something; a framework.",
+        eclipse: "An astronomical event where one celestial body moves into the shadow of another.",
+        eclectic: "Deriving ideas, style, or taste from a broad range of sources.",
+        resonance: "The quality in a sound of being deep, full, and reverberating.",
+        absurdity: "The quality or state of being ridiculous or wildly unreasonable.",
+        simbiosis: "Interaction between two different organisms living in close physical association.",
+        symbiosis: "Interaction between two different organisms living in close physical association.",
+        catharsis: "The process of releasing, and thereby providing relief from, strong emotions.",
+        euphoria: "A feeling or state of intense excitement and happiness.",
+        metafizika: "The branch of metaphysics dealing with the nature of being.",
+        metaphysics: "The branch of metaphysics dealing with the nature of being.",
+        nihilism: "The rejection of all religious and moral principles, in the belief that life is meaningless.",
+        dialectics: "A method of argument for resolving disagreement.",
+        epistemology: "The theory of knowledge, especially with regard to its methods, validity, and scope.",
+        phenomenology: "An approach studying consciousness and direct experiences.",
+        ontology: "The branch of metaphysics dealing with the nature of being."
+      }
+    };
+
+    function getWordDefinition(word) {
+      const w = word.toLowerCase().trim();
+      const defs = wordDefinitions[currentLang] || wordDefinitions.id;
+      return defs[w] || (currentLang === 'id' ? "Kata kustom tantangan" : "Custom challenge word");
+    }
+
     // Render word chips in interface
     function renderWords() {
       const wordsListEl = document.getElementById('words-list');
-      wordsListEl.innerHTML = activeWords.map(word => `
-    <div class="word-chip" id="chip-${word}" onclick="insertWord('${word}')">
-      <span class="check-icon">✓</span>
-      <span class="word-text">${word}</span>
-    </div>
-  `).join('');
+      wordsListEl.innerHTML = activeWords.map(word => {
+        const def = getWordDefinition(word);
+        return `
+          <div class="word-chip-wrapper">
+            <div class="word-tooltip-container">
+              <div class="word-tooltip-inner">${def}</div>
+              <div class="word-tooltip-arrow"></div>
+            </div>
+            <div class="word-chip" id="chip-${word}" onclick="insertWord('${word}')">
+              <span class="check-icon">✓</span>
+              <span class="word-text">${word}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // Insert clicked word into essay input textarea at cursor position
@@ -3813,8 +5059,11 @@
 
       essayInput.value = before + wordToInsert + after;
 
-      // Focus textarea and move cursor
-      essayInput.focus();
+      // Focus textarea and move cursor (skip focus on mobile to prevent virtual keyboard popup)
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
+      if (!isMobile) {
+        essayInput.focus();
+      }
       const newCursorPos = start + wordToInsert.length;
       essayInput.setSelectionRange(newCursorPos, newCursorPos);
 
@@ -4492,8 +5741,181 @@
       }
     }
 
+    // Custom Words State & Functions
+    let customWords = [];
+
+    function updateCustomChipsUI() {
+      const container = document.getElementById('custom-chips-list');
+      const inputField = document.getElementById('custom-input-field');
+      const playBtn = document.getElementById('btn-custom-play');
+      const shareBtn = document.getElementById('btn-custom-share');
+      const wordsCountEl = document.getElementById('custom-words-count');
+      const hintEl = document.getElementById('custom-input-hint');
+      if (!container || !inputField || !playBtn || !shareBtn || !wordsCountEl || !hintEl) return;
+
+      container.innerHTML = '';
+
+      customWords.forEach((word, index) => {
+        const chip = document.createElement('div');
+        chip.className = 'custom-chip';
+        chip.innerHTML = `
+          <span>${word}</span>
+          <span class="remove-btn" onclick="removeCustomWord(${index})">&times;</span>
+        `;
+        container.appendChild(chip);
+      });
+
+      wordsCountEl.textContent = `${customWords.length}/10 ${currentLang === 'id' ? 'kata' : 'words'}`;
+
+      const isValid = customWords.length >= 3 && customWords.length <= 10;
+      playBtn.disabled = !isValid;
+      shareBtn.disabled = !isValid;
+
+      if (customWords.length >= 10) {
+        inputField.style.display = 'none';
+      } else {
+        inputField.style.display = 'inline-block';
+        inputField.placeholder = customWords.length === 0 ?
+          (currentLang === 'id' ? 'Ketik kata lalu spasi...' : 'Type word then space...') : '';
+      }
+
+      if (customWords.length > 0 && customWords.length < 3) {
+        hintEl.style.color = '#ef4444';
+        hintEl.textContent = currentLang === 'id' ? '⚠️ Tambahkan minimal 3 kata!' : '⚠️ Add at least 3 words!';
+      } else {
+        hintEl.style.color = '';
+        hintEl.textContent = currentLang === 'id' ? 'Masukkan 3 hingga 10 kata, dipisahkan dengan spasi.' : 'Enter 3 to 10 words, separated by spaces.';
+      }
+    }
+
+    function addCustomWordChip(word) {
+      const clean = word.replace(/[^a-zA-Z0-9]/g, '').trim();
+      if (!clean) return;
+
+      if (customWords.includes(clean)) return;
+      if (customWords.length >= 10) return;
+
+      customWords.push(clean);
+      updateCustomChipsUI();
+      const inputField = document.getElementById('custom-input-field');
+      if (inputField) inputField.focus();
+    }
+
+    function removeCustomWord(index) {
+      customWords.splice(index, 1);
+      updateCustomChipsUI();
+      const inputField = document.getElementById('custom-input-field');
+      if (inputField) inputField.focus();
+    }
+
+    function removeLastCustomWordChip() {
+      if (customWords.length > 0) {
+        customWords.pop();
+        updateCustomChipsUI();
+      }
+    }
+
+    function playCustomWords() {
+      if (customWords.length < 3 || customWords.length > 10) return;
+
+      activeWords = [...customWords];
+
+      document.querySelectorAll('.btn-level').forEach(btn => btn.classList.remove('active'));
+
+      renderWords();
+      checkWordUsage();
+
+      const essayInput = document.getElementById('essay-input');
+      if (essayInput) {
+        essayInput.value = '';
+        essayInput.style.height = '140px';
+      }
+
+      initTimeMode();
+
+      if (window.innerWidth <= 768 && essayInput) {
+        essayInput.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      showToast(currentLang === 'id' ? '🎮 Tantangan kata kustom dimulai!' : '🎮 Custom word challenge started!');
+    }
+
+    function shareCustomPool() {
+      if (customWords.length < 3 || customWords.length > 10) return;
+
+      const baseUrl = window.location.origin + window.location.pathname;
+      const shareUrl = `${baseUrl}?words=${encodeURIComponent(customWords.join(','))}&lang=${currentLang}&theme=${selectedTheme}&paragraphs=${minParagraphs}&minwords=${minWords}`;
+
+      const shareBox = document.getElementById('custom-share-url-box');
+      const shareText = document.getElementById('custom-share-url-text');
+
+      if (shareText && shareBox) {
+        shareText.textContent = shareUrl;
+        shareBox.style.display = 'block';
+
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          const btn = document.getElementById('btn-copy-custom-url');
+          if (btn) {
+            const originalText = btn.textContent;
+            btn.textContent = currentLang === 'id' ? '✅ Berhasil Disalin!' : '✅ Copied!';
+            setTimeout(() => {
+              btn.textContent = originalText;
+            }, 2000);
+          }
+        }).catch(err => {
+          console.error('Failed to copy share link:', err);
+        });
+      }
+    }
+
+    function copyCustomShareUrl() {
+      const shareTextEl = document.getElementById('custom-share-url-text');
+      if (!shareTextEl) return;
+      const shareText = shareTextEl.textContent;
+      navigator.clipboard.writeText(shareText).then(() => {
+        const btn = document.getElementById('btn-copy-custom-url');
+        if (btn) {
+          const originalText = btn.textContent;
+          btn.textContent = currentLang === 'id' ? '✅ Berhasil Disalin!' : '✅ Copied!';
+          setTimeout(() => {
+            btn.textContent = originalText;
+          }, 2000);
+        }
+      });
+    }
+
+    function shareCurrentVariation() {
+      if (!activeWords || activeWords.length === 0) return;
+
+      const baseUrl = window.location.origin + window.location.pathname;
+      const shareUrl = `${baseUrl}?words=${encodeURIComponent(activeWords.join(','))}&lang=${currentLang}&theme=${selectedTheme}&paragraphs=${minParagraphs}&minwords=${minWords}`;
+
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast(currentLang === 'id' ? '📋 Link variasi game disalin ke clipboard!' : '📋 Game variation link copied to clipboard!');
+      }).catch(err => {
+        console.error('Failed to copy variation link:', err);
+        alert(currentLang === 'id' ? 'Gagal menyalin link.' : 'Failed to copy link.');
+      });
+    }
+
+    function showToast(msg) {
+      let toast = document.getElementById('toast-notification');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast-notification';
+        toast.className = 'toast-notification';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
     // Close welcome modal
     function closeWelcomeModal() {
+      localStorage.setItem('hasPlayedBefore', 'true');
       const backdrop = document.getElementById('welcome-backdrop');
       if (backdrop) {
         backdrop.classList.remove('active');
@@ -4523,6 +5945,7 @@
 
     // Close tutorial modal
     function closeTutorialModal() {
+      localStorage.setItem('hasPlayedBefore', 'true');
       const tutorialBackdrop = document.getElementById('tutorial-backdrop');
       if (tutorialBackdrop) {
         tutorialBackdrop.classList.remove('active');
