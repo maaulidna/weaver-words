@@ -15,6 +15,44 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ======================================================
+    // KONFIGURASI FIREBASE — Ganti dengan config project Anda
+    // ======================================================
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Expose ke global agar bisa dipanggil dari non-module script
+    window._firebaseDb = db;
+    window._firebaseCollection = collection;
+    window._firebaseAddDoc = addDoc;
+    window._firebaseDoc = doc;
+    window._firebaseGetDoc = getDoc;
+    window._firebaseServerTimestamp = serverTimestamp;
+
+    // ======================================================
+    // Auto-load custom pool dari URL param ?pool=ID
+    // ======================================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const poolId = urlParams.get('pool');
+    if (poolId) {
+      window._pendingPoolId = poolId;
+    }
+  </script>
+
   <style>
     :root {
       --primary: #4658cc;
@@ -1885,156 +1923,536 @@
       transform: translateY(-1px);
     }
 
-    @media (max-width: 600px) {
-      body {
-        padding: 16px 12px;
-      }
-
-      .app-container,
-      .results-section {
-        padding: 20px 16px;
-        border-radius: 16px;
-      }
-
-      .level-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
-      .words-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
-      .btn-change-words {
-        width: 100%;
-        justify-content: center;
-        font-size: 14px;
-        padding: 8px 20px;
-        border-radius: 9999px;
-      }
-
-      .words-list {
-        flex-wrap: wrap;
-      }
-
-      .word-chip {
-        font-size: 14px;
-        padding: 8px 20px;
-        border-radius: 9999px;
-        flex: 1;
-        min-width: 100px;
-      }
-
-      .result-card {
-        padding: 16px;
-        gap: 12px;
-      }
-
-      .card-gauge {
-        width: 60px;
-        height: 60px;
-      }
-
-      .modal-card {
-        padding: 20px 16px;
-      }
-
-      /* Responsive adjustments for welcome modal */
-      .welcome-card {
-        padding: 32px;
-      }
-
-      .welcome-logo {
-        height: 50px;
-        margin-bottom: 12px;
-      }
-
-      .welcome-description {
-        font-size: 14px;
-        margin-bottom: 16px;
-        max-width: 220px;
-      }
-
-      .welcome-btn-start {
-        font-size: 20px;
-        padding: 10px 24px;
-        border-radius: 12px;
-      }
-
-      .welcome-subtext {
-        font-size: 11px;
-        margin-top: 8px;
-      }
-
-      .tutorial-card {
-        padding: 24px 16px !important;
-        border-radius: 24px;
-      }
-
-      .tutorial-title {
-        font-size: 20px;
-        margin-bottom: 16px;
-      }
-
-      .tutorial-steps,
-      .tutorial-tips {
-        font-size: 13.5px;
-        margin-left: 16px;
-      }
-
-      .tutorial-goal-box {
-        font-size: 13.5px;
-        padding: 12px;
-      }
-
-      /* Settings modal mobile responsive */
-      .settings-modal-card {
-        padding: 20px 16px;
-        border-radius: 20px;
-      }
-
-      .settings-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 6px;
-      }
-
-      .settings-label {
-        max-width: 100%;
-      }
-
-      .word-count-controls,
-      .theme-controls,
-      .time-mode-controls,
-      .settings-select,
-      #settings-input-minwords,
-      .time-duration-input-wrapper {
-        width: 100% !important;
-        min-width: 0 !important;
-        flex-shrink: 1 !important;
-      }
-
-      .word-count-controls {
-        gap: 8px;
-        padding: 8px;
-      }
-
-      .word-count-btn {
-        width: 32px;
-        height: 32px;
-      }
-
-      .word-count-value {
-        font-size: 18px;
-      }
+    /* ==========================================
+       STICKY NAVBAR
+       ========================================== */
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 9000;
+      background: rgba(248, 250, 252, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 24px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      transition: box-shadow 0.3s ease;
     }
+    body.dark-mode .site-nav {
+      background: rgba(11, 15, 25, 0.92);
+      border-bottom-color: #1e293b;
+    }
+    .site-nav.scrolled {
+      box-shadow: 0 2px 16px rgba(70,88,204,0.08);
+    }
+    .nav-logo {
+      height: 32px;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+    }
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--primary);
+      background: rgba(70,88,204,0.08);
+    }
+    @media (max-width: 600px) {
+      .nav-links { gap: 0; }
+      .nav-links a { padding: 6px 7px; font-size: 12px; }
+    }
+
+    /* ==========================================
+       LANDING PAGE WRAPPER
+       ========================================== */
+    .landing-page {
+      width: 100%;
+      padding-top: 56px; /* height of navbar */
+    }
+
+    /* ==========================================
+       HERO / GAME SECTION
+       ========================================== */
+    #section-game {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px 80px;
+    }
+
+    /* ==========================================
+       ABOUT SECTION
+       ========================================== */
+    #section-about {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      padding: 100px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #section-about::before {
+      content: '';
+      position: absolute;
+      top: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(70,88,204,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .about-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .about-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #818cf8;
+      margin-bottom: 20px;
+    }
+    .about-title {
+      font-size: 38px;
+      font-weight: 800;
+      color: #f1f5f9;
+      line-height: 1.2;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 600px) { .about-title { font-size: 26px; } }
+    .about-body {
+      font-size: 17px;
+      color: #94a3b8;
+      line-height: 1.8;
+      font-style: italic;
+    }
+    .about-divider {
+      width: 48px;
+      height: 3px;
+      background: linear-gradient(90deg, #4658cc, #818cf8);
+      border-radius: 99px;
+      margin: 36px auto 0;
+    }
+
+    /* ==========================================
+       BENEFITS SECTION
+       ========================================== */
+    #section-benefits {
+      padding: 100px 24px;
+      background-color: var(--bg-body);
+    }
+    .section-heading {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .section-heading .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+    .section-heading h2 {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.25;
+    }
+    @media (max-width: 600px) { .section-heading h2 { font-size: 24px; } }
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .benefit-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .benefit-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+    .benefit-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #e8edff 0%, #c7d2fe 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    body.dark-mode .benefit-icon {
+      background: rgba(70,88,204,0.18);
+    }
+    .benefit-card h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 10px;
+    }
+    .benefit-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ==========================================
+       FAQ SECTION
+       ========================================== */
+    #section-faq {
+      padding: 100px 24px;
+      background: var(--bg-card);
+    }
+    body.dark-mode #section-faq { background: #0e1629; }
+    .faq-list {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .faq-item {
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg-body);
+      transition: border-color 0.2s ease;
+    }
+    .faq-item.open {
+      border-color: var(--primary);
+    }
+    .faq-question {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      padding: 18px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .faq-question .faq-chevron {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      color: var(--primary);
+      transition: transform 0.3s ease;
+    }
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .faq-answer-inner {
+      padding: 0 20px 18px;
+    }
+
+    /* ==========================================
+       CUSTOM WORDS SECTION
+       ========================================== */
+    #section-custom {
+      padding: 80px 24px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%);
+    }
+    body.dark-mode #section-custom {
+      background: linear-gradient(135deg, #0f1729 0%, #1a2340 100%);
+    }
+    .custom-words-box {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 20px;
+      padding: 36px;
+      box-shadow: var(--shadow-md);
+    }
+    .custom-words-box h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .custom-words-box .custom-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .custom-input-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .custom-words-input {
+      flex: 1;
+      min-width: 200px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-body);
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .custom-words-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(70,88,204,0.1);
+    }
+    .custom-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+    .custom-hint.error { color: #ef4444; }
+    .custom-hint.success { color: #16a34a; }
+    .btn-custom-apply {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .btn-custom-apply:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+    .btn-share-pool {
+      width: 100%;
+      margin-top: 14px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 1.5px solid var(--primary);
+      background: transparent;
+      color: var(--primary);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-share-pool:hover {
+      background: rgba(70,88,204,0.08);
+    }
+    .share-url-box {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: var(--bg-body);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .share-url-box.visible { display: flex; }
+    .share-url-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+    .btn-copy-url {
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: var(--transition);
+    }
+    .btn-copy-url:hover { background: var(--primary-hover); }
+
+    /* ==========================================
+       FEEDBACK SECTION
+       ========================================== */
+    #section-feedback {
+      padding: 100px 24px;
+      background: var(--bg-body);
+    }
+    .feedback-form-box {
+      max-width: 620px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: var(--shadow-md);
+    }
+    .feedback-field {
+      margin-bottom: 18px;
+    }
+    .feedback-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .feedback-field input,
+    .feedback-field textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-body);
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      box-sizing: border-box;
+    }
+    .feedback-field textarea {
+      height: 120px;
+      resize: none;
+    }
+    .feedback-field input:focus,
+    .feedback-field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(70,88,204,0.1);
+    }
+    .btn-submit-feedback {
+      width: 100%;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 14px rgba(70,88,204,0.3);
+    }
+    .btn-submit-feedback:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+    .btn-submit-feedback:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .feedback-success {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #15803d;
+      text-align: center;
+    }
+    .feedback-success.show { display: block; }
+
+    /* ==========================================
+       IMPROVED RATING SECTION
+       ========================================== */
+    #rating-section {
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+    .game-logo {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 12px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ==========================================
+       FOOTER
+       ========================================== */
+    .site-footer {
+      background: #0f172a;
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: #475569;
+    }
+    .site-footer a { color: #818cf8; text-decoration: none; }
   </style>
 </head>
 
 <body>
+
+  <!-- ================================================
+       STICKY NAVBAR
+       ================================================ -->
+  <nav class="site-nav" id="site-nav">
+    <img src="/static/logo.png" alt="Weave Words" class="nav-logo">
+    <div class="nav-links">
+      <a href="#section-game">Bermain</a>
+      <a href="#section-about">Tentang</a>
+      <a href="#section-benefits">Manfaat</a>
+      <a href="#section-faq">FAQ</a>
+      <a href="#section-feedback">Saran</a>
+    </div>
+  </nav>
 
   <!-- Welcome Modal Card -->
   <div class="welcome-backdrop active" id="welcome-backdrop">
@@ -2146,6 +2564,15 @@
     </div>
   </div>
 
+  <!-- ================================================
+       LANDING PAGE WRAPPER (Single Page Scroll)
+       ================================================ -->
+  <div class="landing-page">
+
+  <!-- ================================================
+       SECTION 1: HERO / GAME
+       ================================================ -->
+  <section id="section-game">
   <div class="game-wrapper">
     <div class="app-container">
       <!-- Header / Logo -->
@@ -2378,9 +2805,272 @@
         </div>
       </div> <!-- Closes .results-modal-card -->
     </div> <!-- Closes .results-section -->
-  </div> <!-- Closes .game-wrapper -->
 
-  <!-- Share Card Container (Hidden) -->
+    <!-- Rating Section -->
+    <div id="rating-section" style="
+      width: 100%;
+      max-width: 640px;
+      margin: 24px auto 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: inherit;
+    ">
+    <div id="rating-card" style="
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    ">
+      <p style="margin: 0 0 6px; font-size: 14px; opacity: 0.6; letter-spacing: 0.05em; text-transform: uppercase;">Rate this game</p>
+      <div id="rating-stars" style="display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; cursor: pointer;">
+        <span class="rating-star" data-val="1" style="font-size: 36px; transition: transform 0.15s;">☆</span>
+        <span class="rating-star" data-val="2" style="font-size: 36px; transition: transform 0.15s;">☆</span>
+        <span class="rating-star" data-val="3" style="font-size: 36px; transition: transform 0.15s;">☆</span>
+        <span class="rating-star" data-val="4" style="font-size: 36px; transition: transform 0.15s;">☆</span>
+        <span class="rating-star" data-val="5" style="font-size: 36px; transition: transform 0.15s;">☆</span>
+      </div>
+      <div id="rating-summary" style="font-size: 13px; opacity: 0.55; min-height: 18px;">Memuat rating...</div>
+      <div id="rating-thankyou" style="display:none; font-size: 14px; margin-top: 8px; opacity: 0.8;">✨ Terima kasih sudah memberi rating!</div>
+    </div>
+  </div> <!-- Closes #rating-section -->
+
+  <script>
+  (function() {
+    const STORAGE_KEY = 'weavewords-ratings-v1';
+    const USER_KEY = 'weavewords-user-rated';
+    const stars = document.querySelectorAll('.rating-star');
+    let userRated = localStorage.getItem(USER_KEY);
+    let hovered = 0;
+
+    function renderStars(active, isHover) {
+      stars.forEach(s => {
+        const v = parseInt(s.dataset.val);
+        s.textContent = v <= active ? '★' : '☆';
+        s.style.color = v <= active ? '#f5c518' : 'inherit';
+        s.style.transform = (isHover && v === active) ? 'scale(1.3)' : 'scale(1)';
+      });
+    }
+
+    async function loadSummary() {
+      try {
+        const res = await window.storage?.get(STORAGE_KEY, true);
+        const data = res ? JSON.parse(res.value) : { total: 0, count: 0 };
+        const avg = data.count > 0 ? (data.total / data.count).toFixed(1) : null;
+        const el = document.getElementById('rating-summary');
+        if (avg) {
+          el.textContent = `⭐ ${avg} / 5 — dari ${data.count} penilaian`;
+        } else {
+          el.textContent = 'Belum ada rating. Jadilah yang pertama!';
+        }
+      } catch(e) {
+        document.getElementById('rating-summary').textContent = '';
+      }
+    }
+
+    async function submitRating(val) {
+      try {
+        const res = await window.storage?.get(STORAGE_KEY, true);
+        const data = res ? JSON.parse(res.value) : { total: 0, count: 0 };
+        data.total += val;
+        data.count += 1;
+        await window.storage?.set(STORAGE_KEY, JSON.stringify(data), true);
+        localStorage.setItem(USER_KEY, val);
+        userRated = val;
+        renderStars(val, false);
+        document.getElementById('rating-thankyou').style.display = 'block';
+        document.getElementById('rating-stars').style.pointerEvents = 'none';
+        loadSummary();
+      } catch(e) {
+        console.error('Rating error', e);
+      }
+    }
+
+    if (userRated) {
+      renderStars(parseInt(userRated), false);
+      document.getElementById('rating-stars').style.pointerEvents = 'none';
+      document.getElementById('rating-thankyou').style.display = 'block';
+    }
+
+    stars.forEach(s => {
+      s.addEventListener('mouseenter', () => {
+        if (userRated) return;
+        hovered = parseInt(s.dataset.val);
+        renderStars(hovered, true);
+      });
+      s.addEventListener('mouseleave', () => {
+        if (userRated) return;
+        hovered = 0;
+        renderStars(0, false);
+      });
+      s.addEventListener('click', () => {
+        if (userRated) return;
+        submitRating(parseInt(s.dataset.val));
+      });
+    });
+
+    loadSummary();
+  })();
+  </script>
+
+  </div> <!-- Closes .game-wrapper -->
+  </section> <!-- Closes #section-game -->
+
+  <!-- ================================================
+       SECTION 2: ABOUT
+       ================================================ -->
+  <section id="section-about">
+    <div class="about-inner">
+      <p class="about-eyebrow">Latar Belakang</p>
+      <h2 class="about-title">Mengapa Weave Words Hadir?</h2>
+      <p class="about-body">
+        Dibuat atas keprihatinan terhadap masifnya penggunaan AI yang mengambil alih tugas-tugas kecil — seperti menyusun kalimat. Hal ini berpotensi mengurangi kemampuan verbal-linguistik manusia dan kemandirian dalam merangkai kata. Weave Words hadir sebagai wadah latihan intensif menulis dan mengasah kembali ketajaman kognitif linguistik yang mulai tumpul di era serba-otomatis ini.
+      </p>
+      <div class="about-divider"></div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       SECTION 3: BENEFITS
+       ================================================ -->
+  <section id="section-benefits">
+    <div class="section-heading">
+      <p class="eyebrow">Kenapa Berlatih di Sini?</p>
+      <h2>Manfaat yang Kamu Dapatkan</h2>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">✍️</div>
+        <h3>Menajamkan Kemampuan Menulis Mandiri</h3>
+        <p>Latih dirimu merangkai kalimat tanpa bantuan AI. Kemampuan menulis yang diasah secara mandiri adalah aset kognitif yang tak ternilai.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">💡</div>
+        <h3>Meningkatkan Kreativitas &amp; Imajinasi</h3>
+        <p>Setiap sesi memaksamu menghubungkan kata-kata acak menjadi narasi yang koheren — mendorong otak untuk berpikir lateral dan kreatif.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">⚡</div>
+        <h3>Melatih Kecepatan Berpikir Struktur Kalimat</h3>
+        <p>Dengan mode timer, kamu dilatih untuk menyusun kalimat yang logis di bawah tekanan waktu — skill krusial dalam komunikasi nyata.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       SECTION 4: CUSTOM WORDS & SHARE
+       ================================================ -->
+  <section id="section-custom">
+    <div class="section-heading">
+      <p class="eyebrow">Personalisasi</p>
+      <h2>Buat & Bagikan Kumpulan Kata Kustom</h2>
+    </div>
+    <div class="custom-words-box">
+      <h3>Generator Kata Kustom</h3>
+      <p class="custom-desc">Masukkan 3–10 kata pilihan kamu (pisahkan dengan spasi), lalu terapkan sebagai kata tantangan baru. Kamu juga bisa membagikan link-nya ke teman!</p>
+      <div class="custom-input-row">
+        <input type="text" class="custom-words-input" id="custom-words-input"
+          placeholder="contoh: senja cahaya harapan jalan sunyi">
+        <button class="btn-custom-apply" onclick="applyCustomWords()">Terapkan</button>
+      </div>
+      <p class="custom-hint" id="custom-hint">3–10 kata, dipisahkan spasi</p>
+      <button class="btn-share-pool" id="btn-share-pool" onclick="shareCustomPool()" style="display:none;">
+        🔗 Bagikan Link Kata Ini
+      </button>
+      <div class="share-url-box" id="share-url-box">
+        <p class="share-url-text" id="share-url-text"></p>
+        <button class="btn-copy-url" onclick="copyShareUrl()">Salin Link</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       SECTION 5: FAQ
+       ================================================ -->
+  <section id="section-faq">
+    <div class="section-heading">
+      <p class="eyebrow">Pertanyaan Umum</p>
+      <h2>FAQ</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Bagaimana cara bermain Weave Words?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">Pilih level kesulitan (mudah, sedang, sulit), lalu gunakan semua kata yang ditampilkan dalam satu paragraf yang koheren. Klik "Nilai tulisanku" untuk mendapat penilaian dari AI.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Apa yang dinilai oleh AI?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">AI menilai 4 aspek: Koherensi (kepaduan antar kalimat), Kebahasaan (tata bahasa & EYD), Kreativitas (orisinalitas ide), dan Penggunaan Kata (ketepatan makna kata dalam konteks).</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Apakah saya harus login untuk bermain?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">Tidak! Weave Words sepenuhnya bisa dimainkan tanpa akun. Cukup buka halaman ini dan langsung bermain. Rating dan progresmu tersimpan di browser lokal.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Bagaimana cara berbagi tantangan kata ke teman?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">Pergi ke bagian "Buat & Bagikan Kata Kustom", masukkan kata-katamu, klik "Terapkan", lalu klik "Bagikan Link Kata Ini". Salin URL unik yang muncul dan kirimkan ke temanmu — mereka langsung bisa bermain dengan kata yang sama!</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Apakah ada perbedaan level kesulitan?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer"><div class="faq-answer-inner">Ya. Level "Mudah" memberikan kata-kata yang umum dan mudah dirangkai. Level "Sedang" menggunakan kata dengan makna yang lebih beragam. Level "Sulit" menggabungkan kata-kata tidak lazim yang membutuhkan kreativitas tinggi.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       SECTION 6: FEEDBACK FORM (Firebase)
+       ================================================ -->
+  <section id="section-feedback">
+    <div class="section-heading">
+      <p class="eyebrow">Suaramu Penting</p>
+      <h2>Kirim Saran & Masukan</h2>
+    </div>
+    <div class="feedback-form-box">
+      <div class="feedback-field">
+        <label for="fb-name">Nama</label>
+        <input type="text" id="fb-name" placeholder="Nama kamu" autocomplete="name">
+      </div>
+      <div class="feedback-field">
+        <label for="fb-email">Email (opsional)</label>
+        <input type="email" id="fb-email" placeholder="email@contoh.com" autocomplete="email">
+      </div>
+      <div class="feedback-field">
+        <label for="fb-message">Pesan / Saran</label>
+        <textarea id="fb-message" placeholder="Ceritakan pengalamanmu atau sampaikan saran untuk perbaikan..."></textarea>
+      </div>
+      <button class="btn-submit-feedback" id="btn-submit-feedback" onclick="submitFeedback()">
+        Kirim Masukan ✉️
+      </button>
+      <div class="feedback-success" id="feedback-success">
+        ✅ Terima kasih! Masukanmu sudah kami terima dan akan sangat membantu.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       FOOTER
+       ================================================ -->
+  <footer class="site-footer">
+    <p>© 2025 <strong>Weave Words</strong> — Asah Kata, Asah Diri.</p>
+  </footer>
+
+  </div> <!-- Closes .landing-page -->
+
   <div class="share-card-container" id="share-card">
     <!-- Title "Paragraph of the day is..." -->
     <div class="share-card-title" id="share-card-title-text">Paragraph of the day is...</div>
@@ -2525,6 +3215,8 @@
         copiedSuccess: "✅ Disalin!",
         shareCaptionText: "Ayo tes kemampuanmu merangkai kata di weavewords.fun!",
         settingsLabelTheme: "Tema Game:",
+        themeBtnLight: "Terang",
+        themeBtnDark: "Gelap",
         settingsLabelTimeMode: "Pengaturan Waktu:",
         settingsLabelDuration: "Durasi Timer:",
         settingsLabelMinParagraphs: "Minimal Paragraf (1 paragraf min. 2 kalimat):",
@@ -2604,6 +3296,8 @@
         settingsLabelWordcount: "Number of words to include:",
         settingsSaveBtn: "Save & Restart",
         settingsLabelTheme: "Game Theme:",
+        themeBtnLight: "Light",
+        themeBtnDark: "Dark",
         settingsLabelTimeMode: "Time Settings:",
         settingsLabelDuration: "Timer Duration:",
         settingsLabelMinParagraphs: "Minimum Paragraphs (1 paragraph min. 2 sentences):",
@@ -2787,6 +3481,10 @@
       document.getElementById('settings-title').textContent = texts.settingsTitle;
       document.getElementById('settings-label-wordcount').textContent = texts.settingsLabelWordcount;
       document.getElementById('settings-label-theme').textContent = texts.settingsLabelTheme;
+      const lightBtn = document.getElementById('theme-btn-light');
+      const darkBtn = document.getElementById('theme-btn-dark');
+      if (lightBtn) lightBtn.textContent = texts.themeBtnLight;
+      if (darkBtn) darkBtn.textContent = texts.themeBtnDark;
       document.getElementById('settings-label-timemode').textContent = texts.settingsLabelTimeMode;
       document.getElementById('settings-label-duration').textContent = texts.settingsLabelDuration;
       document.getElementById('time-mode-btn-none').textContent = texts.btnTimeModeNone;
